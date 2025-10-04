@@ -1,0 +1,823 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="4.0" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+    <edmx:Reference Uri="/sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_COMMUNICATION',Version='0001',SAP__Origin='LOCAL')/$value">
+        <edmx:Include Namespace="com.sap.vocabularies.Communication.v1" Alias="Communication"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="/sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_PERSONALDATA',Version='0001',SAP__Origin='LOCAL')/$value">
+        <edmx:Include Namespace="com.sap.vocabularies.PersonalData.v1" Alias="PersonalData"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="/sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_ANALYTICS',Version='0001',SAP__Origin='LOCAL')/$value">
+        <edmx:Include Namespace="com.sap.vocabularies.Analytics.v1" Alias="Analytics"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="/sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_COMMON',Version='0001',SAP__Origin='LOCAL')/$value">
+        <edmx:Include Namespace="com.sap.vocabularies.Common.v1" Alias="SAP__common"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="/sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_MEASURES',Version='0001',SAP__Origin='LOCAL')/$value">
+        <edmx:Include Namespace="Org.OData.Measures.V1" Alias="SAP__measures"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="/sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_CORE',Version='0001',SAP__Origin='LOCAL')/$value">
+        <edmx:Include Namespace="Org.OData.Core.V1" Alias="SAP__core"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="/sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_CAPABILITIES',Version='0001',SAP__Origin='LOCAL')/$value">
+        <edmx:Include Namespace="Org.OData.Capabilities.V1" Alias="SAP__capabilities"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="/sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_AGGREGATION',Version='0001',SAP__Origin='LOCAL')/$value">
+        <edmx:Include Namespace="Org.OData.Aggregation.V1" Alias="SAP__aggregation"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="/sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_VALIDATION',Version='0001',SAP__Origin='LOCAL')/$value">
+        <edmx:Include Namespace="Org.OData.Validation.V1" Alias="SAP__validation"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="/sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_CODELIST',Version='0001',SAP__Origin='LOCAL')/$value">
+        <edmx:Include Namespace="com.sap.vocabularies.CodeList.v1" Alias="SAP__CodeList"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="/sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_UI',Version='0001',SAP__Origin='LOCAL')/$value">
+        <edmx:Include Namespace="com.sap.vocabularies.UI.v1" Alias="SAP__UI"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="/sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_HTML5',Version='0001',SAP__Origin='LOCAL')/$value">
+        <edmx:Include Namespace="com.sap.vocabularies.HTML5.v1" Alias="SAP__HTML5"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="/sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_PDF',Version='0001',SAP__Origin='LOCAL')/$value">
+        <edmx:Include Namespace="com.sap.vocabularies.PDF.v1" Alias="SAP__PDF"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="/sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_SESSION',Version='0001',SAP__Origin='LOCAL')/$value">
+        <edmx:Include Namespace="com.sap.vocabularies.Session.v1" Alias="SAP__session"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="/sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_HIERARCHY',Version='0001',SAP__Origin='LOCAL')/$value">
+        <edmx:Include Namespace="com.sap.vocabularies.Hierarchy.v1" Alias="SAP__hierarchy"/>
+    </edmx:Reference>
+    <edmx:DataServices>
+        <Schema Namespace="com.sap.gateway.srvd_a2x.rb1m.sd_srv_subcon_v4.v0001" Alias="SAP__self">
+            <Annotation Term="SAP__core.SchemaVersion" String="1.0.0"/>
+            <EntityType Name="xRB1MxSD_C_REQDATESOType">
+                <Key>
+                    <PropertyRef Name="MainIndex"/>
+                    <PropertyRef Name="SoIndex"/>
+                </Key>
+                <Property Name="MainIndex" Type="Edm.Int32" Nullable="false"/>
+                <Property Name="SoIndex" Type="Edm.Byte" Nullable="false"/>
+                <Property Name="Sign" Type="Edm.String" Nullable="false" MaxLength="1"/>
+                <Property Name="Optio" Type="Edm.String" Nullable="false" MaxLength="2"/>
+                <Property Name="Low" Type="Edm.String" Nullable="false" MaxLength="45"/>
+                <Property Name="High" Type="Edm.String" Nullable="false" MaxLength="45"/>
+                <Property Name="SAP__Messages" Type="Collection(com.sap.gateway.srvd_a2x.rb1m.sd_srv_subcon_v4.v0001.SAP__Message)" Nullable="false"/>
+                <NavigationProperty Name="_DynTab" Type="com.sap.gateway.srvd_a2x.rb1m.sd_srv_subcon_v4.v0001.xRB1MxSD_C_DYNTABType" Nullable="false" Partner="_ReqDatNav">
+                    <ReferentialConstraint Property="MainIndex" ReferencedProperty="MainId"/>
+                </NavigationProperty>
+            </EntityType>
+            <EntityType Name="xRB1MxSD_C_ITEMSType">
+                <Key>
+                    <PropertyRef Name="MainIndex"/>
+                    <PropertyRef Name="HeaderIndex"/>
+                    <PropertyRef Name="ItemsIndex"/>
+                    <PropertyRef Name="IsMain"/>
+                </Key>
+                <Property Name="MainIndex" Type="Edm.Int32" Nullable="false"/>
+                <Property Name="HeaderIndex" Type="Edm.Byte" Nullable="false"/>
+                <Property Name="ItemsIndex" Type="Edm.Byte" Nullable="false"/>
+                <Property Name="IsMain" Type="Edm.String" Nullable="false" MaxLength="1"/>
+                <Property Name="Title" Type="Edm.String" Nullable="false" MaxLength="60"/>
+                <Property Name="Col1" Type="Edm.String" Nullable="false" MaxLength="60"/>
+                <Property Name="Col2" Type="Edm.String" Nullable="false" MaxLength="60"/>
+                <Property Name="Col3" Type="Edm.String" Nullable="false" MaxLength="60"/>
+                <Property Name="Col4" Type="Edm.String" Nullable="false" MaxLength="60"/>
+                <Property Name="Col5" Type="Edm.String" Nullable="false" MaxLength="60"/>
+                <Property Name="Col6" Type="Edm.String" Nullable="false" MaxLength="60"/>
+                <Property Name="Col7" Type="Edm.String" Nullable="false" MaxLength="60"/>
+                <Property Name="Col8" Type="Edm.String" Nullable="false" MaxLength="60"/>
+                <Property Name="Col9" Type="Edm.String" Nullable="false" MaxLength="60"/>
+                <Property Name="Col10" Type="Edm.String" Nullable="false" MaxLength="60"/>
+                <Property Name="Col11" Type="Edm.String" Nullable="false" MaxLength="60"/>
+                <Property Name="Col12" Type="Edm.String" Nullable="false" MaxLength="60"/>
+                <Property Name="Col13" Type="Edm.String" Nullable="false" MaxLength="60"/>
+                <Property Name="Col14" Type="Edm.String" Nullable="false" MaxLength="60"/>
+                <Property Name="Col15" Type="Edm.String" Nullable="false" MaxLength="60"/>
+                <Property Name="Col16" Type="Edm.String" Nullable="false" MaxLength="60"/>
+                <Property Name="Col17" Type="Edm.String" Nullable="false" MaxLength="60"/>
+                <Property Name="Col18" Type="Edm.String" Nullable="false" MaxLength="60"/>
+                <Property Name="Col19" Type="Edm.String" Nullable="false" MaxLength="60"/>
+                <Property Name="Col20" Type="Edm.String" Nullable="false" MaxLength="60"/>
+                <Property Name="Col21" Type="Edm.String" Nullable="false" MaxLength="60"/>
+                <Property Name="Col22" Type="Edm.String" Nullable="false" MaxLength="60"/>
+                <Property Name="Col23" Type="Edm.String" Nullable="false" MaxLength="60"/>
+                <Property Name="Col24" Type="Edm.String" Nullable="false" MaxLength="60"/>
+                <Property Name="Col25" Type="Edm.String" Nullable="false" MaxLength="60"/>
+                <Property Name="Action" Type="Edm.String" Nullable="false" MaxLength="60"/>
+                <Property Name="RootId" Type="Edm.String" Nullable="false" MaxLength="1"/>
+                <Property Name="ParentId" Type="Edm.String" Nullable="false" MaxLength="1"/>
+                <Property Name="SAP__Messages" Type="Collection(com.sap.gateway.srvd_a2x.rb1m.sd_srv_subcon_v4.v0001.SAP__Message)" Nullable="false"/>
+                <NavigationProperty Name="_DynTab" Type="com.sap.gateway.srvd_a2x.rb1m.sd_srv_subcon_v4.v0001.xRB1MxSD_C_DYNTABType" Nullable="false" Partner="_ItemsNav">
+                    <ReferentialConstraint Property="MainIndex" ReferencedProperty="MainId"/>
+                </NavigationProperty>
+            </EntityType>
+            <EntityType Name="xRB1MxSD_C_COMPOSOType">
+                <Key>
+                    <PropertyRef Name="MainIndex"/>
+                    <PropertyRef Name="SoIndex"/>
+                </Key>
+                <Property Name="MainIndex" Type="Edm.Int32" Nullable="false"/>
+                <Property Name="SoIndex" Type="Edm.Byte" Nullable="false"/>
+                <Property Name="Sign" Type="Edm.String" Nullable="false" MaxLength="1"/>
+                <Property Name="Optio" Type="Edm.String" Nullable="false" MaxLength="2"/>
+                <Property Name="Low" Type="Edm.String" Nullable="false" MaxLength="45"/>
+                <Property Name="High" Type="Edm.String" Nullable="false" MaxLength="45"/>
+                <Property Name="SAP__Messages" Type="Collection(com.sap.gateway.srvd_a2x.rb1m.sd_srv_subcon_v4.v0001.SAP__Message)" Nullable="false"/>
+                <NavigationProperty Name="_DynTab" Type="com.sap.gateway.srvd_a2x.rb1m.sd_srv_subcon_v4.v0001.xRB1MxSD_C_DYNTABType" Nullable="false" Partner="_CompoNav">
+                    <ReferentialConstraint Property="MainIndex" ReferencedProperty="MainId"/>
+                </NavigationProperty>
+            </EntityType>
+            <EntityType Name="xRB1MxSD_C_VENDORSOType">
+                <Key>
+                    <PropertyRef Name="MainIndex"/>
+                    <PropertyRef Name="SoIndex"/>
+                </Key>
+                <Property Name="MainIndex" Type="Edm.Int32" Nullable="false"/>
+                <Property Name="SoIndex" Type="Edm.Byte" Nullable="false"/>
+                <Property Name="Sign" Type="Edm.String" Nullable="false" MaxLength="1"/>
+                <Property Name="Optio" Type="Edm.String" Nullable="false" MaxLength="2"/>
+                <Property Name="Low" Type="Edm.String" Nullable="false" MaxLength="45"/>
+                <Property Name="High" Type="Edm.String" Nullable="false" MaxLength="45"/>
+                <Property Name="SAP__Messages" Type="Collection(com.sap.gateway.srvd_a2x.rb1m.sd_srv_subcon_v4.v0001.SAP__Message)" Nullable="false"/>
+                <NavigationProperty Name="_DynTab" Type="com.sap.gateway.srvd_a2x.rb1m.sd_srv_subcon_v4.v0001.xRB1MxSD_C_DYNTABType" Nullable="false" Partner="_VendorNav">
+                    <ReferentialConstraint Property="MainIndex" ReferencedProperty="MainId"/>
+                </NavigationProperty>
+            </EntityType>
+            <EntityType Name="xRB1MxSD_C_STORTYPSOType">
+                <Key>
+                    <PropertyRef Name="MainIndex"/>
+                    <PropertyRef Name="SoIndex"/>
+                </Key>
+                <Property Name="MainIndex" Type="Edm.Int32" Nullable="false"/>
+                <Property Name="SoIndex" Type="Edm.Byte" Nullable="false"/>
+                <Property Name="Sign" Type="Edm.String" Nullable="false" MaxLength="1"/>
+                <Property Name="Optio" Type="Edm.String" Nullable="false" MaxLength="2"/>
+                <Property Name="Low" Type="Edm.String" Nullable="false" MaxLength="45"/>
+                <Property Name="High" Type="Edm.String" Nullable="false" MaxLength="45"/>
+                <Property Name="SAP__Messages" Type="Collection(com.sap.gateway.srvd_a2x.rb1m.sd_srv_subcon_v4.v0001.SAP__Message)" Nullable="false"/>
+                <NavigationProperty Name="_DynTab" Type="com.sap.gateway.srvd_a2x.rb1m.sd_srv_subcon_v4.v0001.xRB1MxSD_C_DYNTABType" Nullable="false" Partner="_StorTyNav">
+                    <ReferentialConstraint Property="MainIndex" ReferencedProperty="MainId"/>
+                </NavigationProperty>
+            </EntityType>
+            <EntityType Name="xRB1MxSD_C_DYNTABType">
+                <Key>
+                    <PropertyRef Name="MainId"/>
+                </Key>
+                <Property Name="MainId" Type="Edm.Int32" Nullable="false"/>
+                <Property Name="Title" Type="Edm.String" Nullable="false" MaxLength="60"/>
+                <Property Name="Type" Type="Edm.String" Nullable="false" MaxLength="1"/>
+                <Property Name="SAP__Messages" Type="Collection(com.sap.gateway.srvd_a2x.rb1m.sd_srv_subcon_v4.v0001.SAP__Message)" Nullable="false"/>
+                <NavigationProperty Name="_AssePrNav" Type="Collection(com.sap.gateway.srvd_a2x.rb1m.sd_srv_subcon_v4.v0001.xRB1MxSD_C_ASSEPRDSOType)" Partner="_DynTab">
+                    <OnDelete Action="Cascade"/>
+                </NavigationProperty>
+                <NavigationProperty Name="_CompoNav" Type="Collection(com.sap.gateway.srvd_a2x.rb1m.sd_srv_subcon_v4.v0001.xRB1MxSD_C_COMPOSOType)" Partner="_DynTab">
+                    <OnDelete Action="Cascade"/>
+                </NavigationProperty>
+                <NavigationProperty Name="_HeaderNav" Type="Collection(com.sap.gateway.srvd_a2x.rb1m.sd_srv_subcon_v4.v0001.xRB1MxSD_C_HEADERType)" Partner="_DynTab">
+                    <OnDelete Action="Cascade"/>
+                </NavigationProperty>
+                <NavigationProperty Name="_ItemsNav" Type="Collection(com.sap.gateway.srvd_a2x.rb1m.sd_srv_subcon_v4.v0001.xRB1MxSD_C_ITEMSType)" Partner="_DynTab">
+                    <OnDelete Action="Cascade"/>
+                </NavigationProperty>
+                <NavigationProperty Name="_PurOrdNav" Type="Collection(com.sap.gateway.srvd_a2x.rb1m.sd_srv_subcon_v4.v0001.xRB1MxSD_C_PURCORDSOType)" Partner="_DynTab">
+                    <OnDelete Action="Cascade"/>
+                </NavigationProperty>
+                <NavigationProperty Name="_ReqDatNav" Type="Collection(com.sap.gateway.srvd_a2x.rb1m.sd_srv_subcon_v4.v0001.xRB1MxSD_C_REQDATESOType)" Partner="_DynTab">
+                    <OnDelete Action="Cascade"/>
+                </NavigationProperty>
+                <NavigationProperty Name="_StorBiNav" Type="Collection(com.sap.gateway.srvd_a2x.rb1m.sd_srv_subcon_v4.v0001.xRB1MxSD_C_STORBINSOType)" Partner="_DynTab">
+                    <OnDelete Action="Cascade"/>
+                </NavigationProperty>
+                <NavigationProperty Name="_StorTyNav" Type="Collection(com.sap.gateway.srvd_a2x.rb1m.sd_srv_subcon_v4.v0001.xRB1MxSD_C_STORTYPSOType)" Partner="_DynTab">
+                    <OnDelete Action="Cascade"/>
+                </NavigationProperty>
+                <NavigationProperty Name="_VendorNav" Type="Collection(com.sap.gateway.srvd_a2x.rb1m.sd_srv_subcon_v4.v0001.xRB1MxSD_C_VENDORSOType)" Partner="_DynTab">
+                    <OnDelete Action="Cascade"/>
+                </NavigationProperty>
+            </EntityType>
+            <EntityType Name="xRB1MxSD_C_HEADERType">
+                <Key>
+                    <PropertyRef Name="MainIndex"/>
+                    <PropertyRef Name="HeaderIndex"/>
+                    <PropertyRef Name="IsMain"/>
+                </Key>
+                <Property Name="MainIndex" Type="Edm.Int32" Nullable="false"/>
+                <Property Name="HeaderIndex" Type="Edm.Byte" Nullable="false"/>
+                <Property Name="IsMain" Type="Edm.String" Nullable="false" MaxLength="1"/>
+                <Property Name="Title" Type="Edm.String" Nullable="false" MaxLength="60"/>
+                <Property Name="HeaderName" Type="Edm.String" Nullable="false" MaxLength="30"/>
+                <Property Name="HeaderType" Type="Edm.String" Nullable="false" MaxLength="40"/>
+                <Property Name="HeaderKey" Type="Edm.String" Nullable="false" MaxLength="1"/>
+                <Property Name="HeaderValue" Type="Edm.String" Nullable="false" MaxLength="60"/>
+                <Property Name="MainPosition" Type="Edm.Byte" Nullable="false"/>
+                <Property Name="Editable" Type="Edm.String" Nullable="false" MaxLength="1"/>
+                <Property Name="Visible" Type="Edm.String" Nullable="false" MaxLength="1"/>
+                <Property Name="SAP__Messages" Type="Collection(com.sap.gateway.srvd_a2x.rb1m.sd_srv_subcon_v4.v0001.SAP__Message)" Nullable="false"/>
+                <NavigationProperty Name="_DynTab" Type="com.sap.gateway.srvd_a2x.rb1m.sd_srv_subcon_v4.v0001.xRB1MxSD_C_DYNTABType" Nullable="false" Partner="_HeaderNav">
+                    <ReferentialConstraint Property="MainIndex" ReferencedProperty="MainId"/>
+                </NavigationProperty>
+            </EntityType>
+            <EntityType Name="xRB1MxSD_C_STORBINSOType">
+                <Key>
+                    <PropertyRef Name="MainIndex"/>
+                    <PropertyRef Name="SoIndex"/>
+                </Key>
+                <Property Name="MainIndex" Type="Edm.Int32" Nullable="false"/>
+                <Property Name="SoIndex" Type="Edm.Byte" Nullable="false"/>
+                <Property Name="Sign" Type="Edm.String" Nullable="false" MaxLength="1"/>
+                <Property Name="Optio" Type="Edm.String" Nullable="false" MaxLength="2"/>
+                <Property Name="Low" Type="Edm.String" Nullable="false" MaxLength="45"/>
+                <Property Name="High" Type="Edm.String" Nullable="false" MaxLength="45"/>
+                <Property Name="SAP__Messages" Type="Collection(com.sap.gateway.srvd_a2x.rb1m.sd_srv_subcon_v4.v0001.SAP__Message)" Nullable="false"/>
+                <NavigationProperty Name="_DynTab" Type="com.sap.gateway.srvd_a2x.rb1m.sd_srv_subcon_v4.v0001.xRB1MxSD_C_DYNTABType" Nullable="false" Partner="_StorBiNav">
+                    <ReferentialConstraint Property="MainIndex" ReferencedProperty="MainId"/>
+                </NavigationProperty>
+            </EntityType>
+            <EntityType Name="xRB1MxSD_C_ASSEPRDSOType">
+                <Key>
+                    <PropertyRef Name="MainIndex"/>
+                    <PropertyRef Name="SoIndex"/>
+                </Key>
+                <Property Name="MainIndex" Type="Edm.Int32" Nullable="false"/>
+                <Property Name="SoIndex" Type="Edm.Byte" Nullable="false"/>
+                <Property Name="Sign" Type="Edm.String" Nullable="false" MaxLength="1"/>
+                <Property Name="Optio" Type="Edm.String" Nullable="false" MaxLength="2"/>
+                <Property Name="Low" Type="Edm.String" Nullable="false" MaxLength="45"/>
+                <Property Name="High" Type="Edm.String" Nullable="false" MaxLength="45"/>
+                <Property Name="SAP__Messages" Type="Collection(com.sap.gateway.srvd_a2x.rb1m.sd_srv_subcon_v4.v0001.SAP__Message)" Nullable="false"/>
+                <NavigationProperty Name="_DynTab" Type="com.sap.gateway.srvd_a2x.rb1m.sd_srv_subcon_v4.v0001.xRB1MxSD_C_DYNTABType" Nullable="false" Partner="_AssePrNav">
+                    <ReferentialConstraint Property="MainIndex" ReferencedProperty="MainId"/>
+                </NavigationProperty>
+            </EntityType>
+            <EntityType Name="xRB1MxSD_C_PURCORDSOType">
+                <Key>
+                    <PropertyRef Name="MainIndex"/>
+                    <PropertyRef Name="SoIndex"/>
+                </Key>
+                <Property Name="MainIndex" Type="Edm.Int32" Nullable="false"/>
+                <Property Name="SoIndex" Type="Edm.Byte" Nullable="false"/>
+                <Property Name="Sign" Type="Edm.String" Nullable="false" MaxLength="1"/>
+                <Property Name="Optio" Type="Edm.String" Nullable="false" MaxLength="2"/>
+                <Property Name="Low" Type="Edm.String" Nullable="false" MaxLength="45"/>
+                <Property Name="High" Type="Edm.String" Nullable="false" MaxLength="45"/>
+                <Property Name="SAP__Messages" Type="Collection(com.sap.gateway.srvd_a2x.rb1m.sd_srv_subcon_v4.v0001.SAP__Message)" Nullable="false"/>
+                <NavigationProperty Name="_DynTab" Type="com.sap.gateway.srvd_a2x.rb1m.sd_srv_subcon_v4.v0001.xRB1MxSD_C_DYNTABType" Nullable="false" Partner="_PurOrdNav">
+                    <ReferentialConstraint Property="MainIndex" ReferencedProperty="MainId"/>
+                </NavigationProperty>
+            </EntityType>
+            <ComplexType Name="SAP__Message">
+                <Property Name="code" Type="Edm.String" Nullable="false"/>
+                <Property Name="message" Type="Edm.String" Nullable="false"/>
+                <Property Name="target" Type="Edm.String"/>
+                <Property Name="additionalTargets" Type="Collection(Edm.String)" Nullable="false"/>
+                <Property Name="transition" Type="Edm.Boolean" Nullable="false"/>
+                <Property Name="numericSeverity" Type="Edm.Byte" Nullable="false"/>
+                <Property Name="longtextUrl" Type="Edm.String"/>
+            </ComplexType>
+            <EntityContainer Name="Container">
+                <EntitySet Name="xRB1MxSD_C_ASSEPRDSO" EntityType="com.sap.gateway.srvd_a2x.rb1m.sd_srv_subcon_v4.v0001.xRB1MxSD_C_ASSEPRDSOType">
+                    <NavigationPropertyBinding Path="_DynTab" Target="xRB1MxSD_C_DYNTAB"/>
+                </EntitySet>
+                <EntitySet Name="xRB1MxSD_C_COMPOSO" EntityType="com.sap.gateway.srvd_a2x.rb1m.sd_srv_subcon_v4.v0001.xRB1MxSD_C_COMPOSOType">
+                    <NavigationPropertyBinding Path="_DynTab" Target="xRB1MxSD_C_DYNTAB"/>
+                </EntitySet>
+                <EntitySet Name="xRB1MxSD_C_DYNTAB" EntityType="com.sap.gateway.srvd_a2x.rb1m.sd_srv_subcon_v4.v0001.xRB1MxSD_C_DYNTABType">
+                    <NavigationPropertyBinding Path="_AssePrNav" Target="xRB1MxSD_C_ASSEPRDSO"/>
+                    <NavigationPropertyBinding Path="_CompoNav" Target="xRB1MxSD_C_COMPOSO"/>
+                    <NavigationPropertyBinding Path="_HeaderNav" Target="xRB1MxSD_C_HEADER"/>
+                    <NavigationPropertyBinding Path="_ItemsNav" Target="xRB1MxSD_C_ITEMS"/>
+                    <NavigationPropertyBinding Path="_PurOrdNav" Target="xRB1MxSD_C_PURCORDSO"/>
+                    <NavigationPropertyBinding Path="_ReqDatNav" Target="xRB1MxSD_C_REQDATESO"/>
+                    <NavigationPropertyBinding Path="_StorBiNav" Target="xRB1MxSD_C_STORBINSO"/>
+                    <NavigationPropertyBinding Path="_StorTyNav" Target="xRB1MxSD_C_STORTYPSO"/>
+                    <NavigationPropertyBinding Path="_VendorNav" Target="xRB1MxSD_C_VENDORSO"/>
+                </EntitySet>
+                <EntitySet Name="xRB1MxSD_C_HEADER" EntityType="com.sap.gateway.srvd_a2x.rb1m.sd_srv_subcon_v4.v0001.xRB1MxSD_C_HEADERType">
+                    <NavigationPropertyBinding Path="_DynTab" Target="xRB1MxSD_C_DYNTAB"/>
+                </EntitySet>
+                <EntitySet Name="xRB1MxSD_C_ITEMS" EntityType="com.sap.gateway.srvd_a2x.rb1m.sd_srv_subcon_v4.v0001.xRB1MxSD_C_ITEMSType">
+                    <NavigationPropertyBinding Path="_DynTab" Target="xRB1MxSD_C_DYNTAB"/>
+                </EntitySet>
+                <EntitySet Name="xRB1MxSD_C_PURCORDSO" EntityType="com.sap.gateway.srvd_a2x.rb1m.sd_srv_subcon_v4.v0001.xRB1MxSD_C_PURCORDSOType">
+                    <NavigationPropertyBinding Path="_DynTab" Target="xRB1MxSD_C_DYNTAB"/>
+                </EntitySet>
+                <EntitySet Name="xRB1MxSD_C_REQDATESO" EntityType="com.sap.gateway.srvd_a2x.rb1m.sd_srv_subcon_v4.v0001.xRB1MxSD_C_REQDATESOType">
+                    <NavigationPropertyBinding Path="_DynTab" Target="xRB1MxSD_C_DYNTAB"/>
+                </EntitySet>
+                <EntitySet Name="xRB1MxSD_C_STORBINSO" EntityType="com.sap.gateway.srvd_a2x.rb1m.sd_srv_subcon_v4.v0001.xRB1MxSD_C_STORBINSOType">
+                    <NavigationPropertyBinding Path="_DynTab" Target="xRB1MxSD_C_DYNTAB"/>
+                </EntitySet>
+                <EntitySet Name="xRB1MxSD_C_STORTYPSO" EntityType="com.sap.gateway.srvd_a2x.rb1m.sd_srv_subcon_v4.v0001.xRB1MxSD_C_STORTYPSOType">
+                    <NavigationPropertyBinding Path="_DynTab" Target="xRB1MxSD_C_DYNTAB"/>
+                </EntitySet>
+                <EntitySet Name="xRB1MxSD_C_VENDORSO" EntityType="com.sap.gateway.srvd_a2x.rb1m.sd_srv_subcon_v4.v0001.xRB1MxSD_C_VENDORSOType">
+                    <NavigationPropertyBinding Path="_DynTab" Target="xRB1MxSD_C_DYNTAB"/>
+                </EntitySet>
+            </EntityContainer>
+            <Annotations Target="SAP__self.xRB1MxSD_C_REQDATESOType/MainIndex">
+                <Annotation Term="SAP__core.Computed"/>
+            </Annotations>
+            <Annotations Target="SAP__self.xRB1MxSD_C_REQDATESOType/SoIndex">
+                <Annotation Term="SAP__core.Computed"/>
+            </Annotations>
+            <Annotations Target="SAP__self.xRB1MxSD_C_REQDATESOType">
+                <Annotation Term="SAP__common.Label" String="Select Option Requirement Date"/>
+                <Annotation Term="SAP__common.Messages" Path="SAP__Messages"/>
+            </Annotations>
+            <Annotations Target="SAP__self.Container/xRB1MxSD_C_REQDATESO">
+                <Annotation Term="SAP__capabilities.SearchRestrictions">
+                    <Record>
+                        <PropertyValue Property="Searchable" Bool="false"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.InsertRestrictions">
+                    <Record>
+                        <PropertyValue Property="Insertable" Bool="false"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__core.OptimisticConcurrency">
+                    <Collection/>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.UpdateRestrictions">
+                    <Record>
+                        <PropertyValue Property="QueryOptions">
+                            <Record>
+                                <PropertyValue Property="SelectSupported" Bool="true"/>
+                            </Record>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="SAP__self.xRB1MxSD_C_ITEMSType/MainIndex">
+                <Annotation Term="SAP__core.Computed"/>
+            </Annotations>
+            <Annotations Target="SAP__self.xRB1MxSD_C_ITEMSType/HeaderIndex">
+                <Annotation Term="SAP__core.Computed"/>
+            </Annotations>
+            <Annotations Target="SAP__self.xRB1MxSD_C_ITEMSType/ItemsIndex">
+                <Annotation Term="SAP__core.Computed"/>
+            </Annotations>
+            <Annotations Target="SAP__self.xRB1MxSD_C_ITEMSType/IsMain">
+                <Annotation Term="SAP__core.Computed"/>
+            </Annotations>
+            <Annotations Target="SAP__self.xRB1MxSD_C_ITEMSType">
+                <Annotation Term="SAP__common.Label" String="Custome Entity for Items"/>
+                <Annotation Term="SAP__common.Messages" Path="SAP__Messages"/>
+            </Annotations>
+            <Annotations Target="SAP__self.Container/xRB1MxSD_C_ITEMS">
+                <Annotation Term="SAP__capabilities.SearchRestrictions">
+                    <Record>
+                        <PropertyValue Property="Searchable" Bool="false"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.InsertRestrictions">
+                    <Record>
+                        <PropertyValue Property="Insertable" Bool="false"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__core.OptimisticConcurrency">
+                    <Collection/>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.UpdateRestrictions">
+                    <Record>
+                        <PropertyValue Property="QueryOptions">
+                            <Record>
+                                <PropertyValue Property="SelectSupported" Bool="true"/>
+                            </Record>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="SAP__self.xRB1MxSD_C_COMPOSOType/MainIndex">
+                <Annotation Term="SAP__core.Computed"/>
+            </Annotations>
+            <Annotations Target="SAP__self.xRB1MxSD_C_COMPOSOType/SoIndex">
+                <Annotation Term="SAP__core.Computed"/>
+            </Annotations>
+            <Annotations Target="SAP__self.xRB1MxSD_C_COMPOSOType">
+                <Annotation Term="SAP__common.Label" String="Select Option Component"/>
+                <Annotation Term="SAP__common.Messages" Path="SAP__Messages"/>
+            </Annotations>
+            <Annotations Target="SAP__self.Container/xRB1MxSD_C_COMPOSO">
+                <Annotation Term="SAP__capabilities.SearchRestrictions">
+                    <Record>
+                        <PropertyValue Property="Searchable" Bool="false"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.InsertRestrictions">
+                    <Record>
+                        <PropertyValue Property="Insertable" Bool="false"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__core.OptimisticConcurrency">
+                    <Collection/>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.UpdateRestrictions">
+                    <Record>
+                        <PropertyValue Property="QueryOptions">
+                            <Record>
+                                <PropertyValue Property="SelectSupported" Bool="true"/>
+                            </Record>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="SAP__self.xRB1MxSD_C_VENDORSOType/MainIndex">
+                <Annotation Term="SAP__core.Computed"/>
+            </Annotations>
+            <Annotations Target="SAP__self.xRB1MxSD_C_VENDORSOType/SoIndex">
+                <Annotation Term="SAP__core.Computed"/>
+            </Annotations>
+            <Annotations Target="SAP__self.xRB1MxSD_C_VENDORSOType">
+                <Annotation Term="SAP__common.Label" String="Select Option Vendor"/>
+                <Annotation Term="SAP__common.Messages" Path="SAP__Messages"/>
+            </Annotations>
+            <Annotations Target="SAP__self.Container/xRB1MxSD_C_VENDORSO">
+                <Annotation Term="SAP__capabilities.SearchRestrictions">
+                    <Record>
+                        <PropertyValue Property="Searchable" Bool="false"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.InsertRestrictions">
+                    <Record>
+                        <PropertyValue Property="Insertable" Bool="false"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__core.OptimisticConcurrency">
+                    <Collection/>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.UpdateRestrictions">
+                    <Record>
+                        <PropertyValue Property="QueryOptions">
+                            <Record>
+                                <PropertyValue Property="SelectSupported" Bool="true"/>
+                            </Record>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="SAP__self.xRB1MxSD_C_STORTYPSOType/MainIndex">
+                <Annotation Term="SAP__core.Computed"/>
+            </Annotations>
+            <Annotations Target="SAP__self.xRB1MxSD_C_STORTYPSOType/SoIndex">
+                <Annotation Term="SAP__core.Computed"/>
+            </Annotations>
+            <Annotations Target="SAP__self.xRB1MxSD_C_STORTYPSOType">
+                <Annotation Term="SAP__common.Label" String="Select Option Storage Type"/>
+                <Annotation Term="SAP__common.Messages" Path="SAP__Messages"/>
+            </Annotations>
+            <Annotations Target="SAP__self.Container/xRB1MxSD_C_STORTYPSO">
+                <Annotation Term="SAP__capabilities.SearchRestrictions">
+                    <Record>
+                        <PropertyValue Property="Searchable" Bool="false"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.InsertRestrictions">
+                    <Record>
+                        <PropertyValue Property="Insertable" Bool="false"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__core.OptimisticConcurrency">
+                    <Collection/>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.UpdateRestrictions">
+                    <Record>
+                        <PropertyValue Property="QueryOptions">
+                            <Record>
+                                <PropertyValue Property="SelectSupported" Bool="true"/>
+                            </Record>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="SAP__self.xRB1MxSD_C_DYNTABType/MainId">
+                <Annotation Term="SAP__core.Computed"/>
+            </Annotations>
+            <Annotations Target="SAP__self.xRB1MxSD_C_DYNTABType/_AssePrNav">
+                <Annotation Term="SAP__common.Composition"/>
+            </Annotations>
+            <Annotations Target="SAP__self.Container/xRB1MxSD_C_DYNTAB">
+                <Annotation Term="SAP__capabilities.NavigationRestrictions">
+                    <Record>
+                        <PropertyValue Property="RestrictedProperties">
+                            <Collection>
+                                <Record>
+                                    <PropertyValue Property="NavigationProperty" NavigationPropertyPath="_AssePrNav"/>
+                                    <PropertyValue Property="InsertRestrictions">
+                                        <Record>
+                                            <PropertyValue Property="Insertable" Bool="true"/>
+                                        </Record>
+                                    </PropertyValue>
+                                </Record>
+                                <Record>
+                                    <PropertyValue Property="NavigationProperty" NavigationPropertyPath="_CompoNav"/>
+                                    <PropertyValue Property="InsertRestrictions">
+                                        <Record>
+                                            <PropertyValue Property="Insertable" Bool="true"/>
+                                        </Record>
+                                    </PropertyValue>
+                                </Record>
+                                <Record>
+                                    <PropertyValue Property="NavigationProperty" NavigationPropertyPath="_HeaderNav"/>
+                                    <PropertyValue Property="InsertRestrictions">
+                                        <Record>
+                                            <PropertyValue Property="Insertable" Bool="true"/>
+                                        </Record>
+                                    </PropertyValue>
+                                </Record>
+                                <Record>
+                                    <PropertyValue Property="NavigationProperty" NavigationPropertyPath="_ItemsNav"/>
+                                    <PropertyValue Property="InsertRestrictions">
+                                        <Record>
+                                            <PropertyValue Property="Insertable" Bool="true"/>
+                                        </Record>
+                                    </PropertyValue>
+                                </Record>
+                                <Record>
+                                    <PropertyValue Property="NavigationProperty" NavigationPropertyPath="_PurOrdNav"/>
+                                    <PropertyValue Property="InsertRestrictions">
+                                        <Record>
+                                            <PropertyValue Property="Insertable" Bool="true"/>
+                                        </Record>
+                                    </PropertyValue>
+                                </Record>
+                                <Record>
+                                    <PropertyValue Property="NavigationProperty" NavigationPropertyPath="_ReqDatNav"/>
+                                    <PropertyValue Property="InsertRestrictions">
+                                        <Record>
+                                            <PropertyValue Property="Insertable" Bool="true"/>
+                                        </Record>
+                                    </PropertyValue>
+                                </Record>
+                                <Record>
+                                    <PropertyValue Property="NavigationProperty" NavigationPropertyPath="_StorBiNav"/>
+                                    <PropertyValue Property="InsertRestrictions">
+                                        <Record>
+                                            <PropertyValue Property="Insertable" Bool="true"/>
+                                        </Record>
+                                    </PropertyValue>
+                                </Record>
+                                <Record>
+                                    <PropertyValue Property="NavigationProperty" NavigationPropertyPath="_StorTyNav"/>
+                                    <PropertyValue Property="InsertRestrictions">
+                                        <Record>
+                                            <PropertyValue Property="Insertable" Bool="true"/>
+                                        </Record>
+                                    </PropertyValue>
+                                </Record>
+                                <Record>
+                                    <PropertyValue Property="NavigationProperty" NavigationPropertyPath="_VendorNav"/>
+                                    <PropertyValue Property="InsertRestrictions">
+                                        <Record>
+                                            <PropertyValue Property="Insertable" Bool="true"/>
+                                        </Record>
+                                    </PropertyValue>
+                                </Record>
+                            </Collection>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.SearchRestrictions">
+                    <Record>
+                        <PropertyValue Property="Searchable" Bool="false"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__core.OptimisticConcurrency">
+                    <Collection/>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.UpdateRestrictions">
+                    <Record>
+                        <PropertyValue Property="QueryOptions">
+                            <Record>
+                                <PropertyValue Property="SelectSupported" Bool="true"/>
+                            </Record>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="SAP__self.xRB1MxSD_C_DYNTABType/_CompoNav">
+                <Annotation Term="SAP__common.Composition"/>
+            </Annotations>
+            <Annotations Target="SAP__self.xRB1MxSD_C_DYNTABType/_HeaderNav">
+                <Annotation Term="SAP__common.Composition"/>
+            </Annotations>
+            <Annotations Target="SAP__self.xRB1MxSD_C_DYNTABType/_ItemsNav">
+                <Annotation Term="SAP__common.Composition"/>
+            </Annotations>
+            <Annotations Target="SAP__self.xRB1MxSD_C_DYNTABType/_PurOrdNav">
+                <Annotation Term="SAP__common.Composition"/>
+            </Annotations>
+            <Annotations Target="SAP__self.xRB1MxSD_C_DYNTABType/_ReqDatNav">
+                <Annotation Term="SAP__common.Composition"/>
+            </Annotations>
+            <Annotations Target="SAP__self.xRB1MxSD_C_DYNTABType/_StorBiNav">
+                <Annotation Term="SAP__common.Composition"/>
+            </Annotations>
+            <Annotations Target="SAP__self.xRB1MxSD_C_DYNTABType/_StorTyNav">
+                <Annotation Term="SAP__common.Composition"/>
+            </Annotations>
+            <Annotations Target="SAP__self.xRB1MxSD_C_DYNTABType/_VendorNav">
+                <Annotation Term="SAP__common.Composition"/>
+            </Annotations>
+            <Annotations Target="SAP__self.xRB1MxSD_C_DYNTABType">
+                <Annotation Term="SAP__common.Label" String="Dynamic Table Root View Entity"/>
+                <Annotation Term="SAP__common.Messages" Path="SAP__Messages"/>
+            </Annotations>
+            <Annotations Target="SAP__self.xRB1MxSD_C_HEADERType/MainIndex">
+                <Annotation Term="SAP__core.Computed"/>
+            </Annotations>
+            <Annotations Target="SAP__self.xRB1MxSD_C_HEADERType/HeaderIndex">
+                <Annotation Term="SAP__core.Computed"/>
+            </Annotations>
+            <Annotations Target="SAP__self.xRB1MxSD_C_HEADERType/IsMain">
+                <Annotation Term="SAP__core.Computed"/>
+            </Annotations>
+            <Annotations Target="SAP__self.xRB1MxSD_C_HEADERType">
+                <Annotation Term="SAP__common.Label" String="Custome Entity for Header"/>
+                <Annotation Term="SAP__common.Messages" Path="SAP__Messages"/>
+            </Annotations>
+            <Annotations Target="SAP__self.Container/xRB1MxSD_C_HEADER">
+                <Annotation Term="SAP__capabilities.SearchRestrictions">
+                    <Record>
+                        <PropertyValue Property="Searchable" Bool="false"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.InsertRestrictions">
+                    <Record>
+                        <PropertyValue Property="Insertable" Bool="false"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__core.OptimisticConcurrency">
+                    <Collection/>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.UpdateRestrictions">
+                    <Record>
+                        <PropertyValue Property="QueryOptions">
+                            <Record>
+                                <PropertyValue Property="SelectSupported" Bool="true"/>
+                            </Record>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="SAP__self.xRB1MxSD_C_STORBINSOType/MainIndex">
+                <Annotation Term="SAP__core.Computed"/>
+            </Annotations>
+            <Annotations Target="SAP__self.xRB1MxSD_C_STORBINSOType/SoIndex">
+                <Annotation Term="SAP__core.Computed"/>
+            </Annotations>
+            <Annotations Target="SAP__self.xRB1MxSD_C_STORBINSOType">
+                <Annotation Term="SAP__common.Label" String="Select Option Storage Bin"/>
+                <Annotation Term="SAP__common.Messages" Path="SAP__Messages"/>
+            </Annotations>
+            <Annotations Target="SAP__self.Container/xRB1MxSD_C_STORBINSO">
+                <Annotation Term="SAP__capabilities.SearchRestrictions">
+                    <Record>
+                        <PropertyValue Property="Searchable" Bool="false"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.InsertRestrictions">
+                    <Record>
+                        <PropertyValue Property="Insertable" Bool="false"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__core.OptimisticConcurrency">
+                    <Collection/>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.UpdateRestrictions">
+                    <Record>
+                        <PropertyValue Property="QueryOptions">
+                            <Record>
+                                <PropertyValue Property="SelectSupported" Bool="true"/>
+                            </Record>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="SAP__self.xRB1MxSD_C_ASSEPRDSOType/MainIndex">
+                <Annotation Term="SAP__core.Computed"/>
+            </Annotations>
+            <Annotations Target="SAP__self.xRB1MxSD_C_ASSEPRDSOType/SoIndex">
+                <Annotation Term="SAP__core.Computed"/>
+            </Annotations>
+            <Annotations Target="SAP__self.xRB1MxSD_C_ASSEPRDSOType">
+                <Annotation Term="SAP__common.Label" String="Select Option Assembly Product"/>
+                <Annotation Term="SAP__common.Messages" Path="SAP__Messages"/>
+            </Annotations>
+            <Annotations Target="SAP__self.Container/xRB1MxSD_C_ASSEPRDSO">
+                <Annotation Term="SAP__capabilities.SearchRestrictions">
+                    <Record>
+                        <PropertyValue Property="Searchable" Bool="false"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.InsertRestrictions">
+                    <Record>
+                        <PropertyValue Property="Insertable" Bool="false"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__core.OptimisticConcurrency">
+                    <Collection/>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.UpdateRestrictions">
+                    <Record>
+                        <PropertyValue Property="QueryOptions">
+                            <Record>
+                                <PropertyValue Property="SelectSupported" Bool="true"/>
+                            </Record>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="SAP__self.xRB1MxSD_C_PURCORDSOType/MainIndex">
+                <Annotation Term="SAP__core.Computed"/>
+            </Annotations>
+            <Annotations Target="SAP__self.xRB1MxSD_C_PURCORDSOType/SoIndex">
+                <Annotation Term="SAP__core.Computed"/>
+            </Annotations>
+            <Annotations Target="SAP__self.xRB1MxSD_C_PURCORDSOType">
+                <Annotation Term="SAP__common.Label" String="Select Option Purchase Order"/>
+                <Annotation Term="SAP__common.Messages" Path="SAP__Messages"/>
+            </Annotations>
+            <Annotations Target="SAP__self.Container/xRB1MxSD_C_PURCORDSO">
+                <Annotation Term="SAP__capabilities.SearchRestrictions">
+                    <Record>
+                        <PropertyValue Property="Searchable" Bool="false"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.InsertRestrictions">
+                    <Record>
+                        <PropertyValue Property="Insertable" Bool="false"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__core.OptimisticConcurrency">
+                    <Collection/>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.UpdateRestrictions">
+                    <Record>
+                        <PropertyValue Property="QueryOptions">
+                            <Record>
+                                <PropertyValue Property="SelectSupported" Bool="true"/>
+                            </Record>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="SAP__self.Container">
+                <Annotation Term="SAP__aggregation.ApplySupported">
+                    <Record>
+                        <PropertyValue Property="Transformations">
+                            <Collection>
+                                <String>aggregate</String>
+                                <String>groupby</String>
+                                <String>filter</String>
+                            </Collection>
+                        </PropertyValue>
+                        <PropertyValue Property="Rollup" EnumMember="SAP__aggregation.RollupType/None"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__common.ApplyMultiUnitBehaviorForSortingAndFiltering" Bool="true"/>
+                <Annotation Term="SAP__capabilities.FilterFunctions">
+                    <Collection>
+                        <String>eq</String>
+                        <String>ne</String>
+                        <String>gt</String>
+                        <String>ge</String>
+                        <String>lt</String>
+                        <String>le</String>
+                        <String>and</String>
+                        <String>or</String>
+                        <String>contains</String>
+                        <String>startswith</String>
+                        <String>endswith</String>
+                        <String>any</String>
+                        <String>all</String>
+                    </Collection>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.SupportedFormats">
+                    <Collection>
+                        <String>application/json</String>
+                        <String>application/pdf</String>
+                    </Collection>
+                </Annotation>
+                <Annotation Term="SAP__PDF.Features">
+                    <Record>
+                        <PropertyValue Property="DocumentDescriptionReference" String="../../../../default/iwbep/common/0001/$metadata"/>
+                        <PropertyValue Property="DocumentDescriptionCollection" String="MyDocumentDescriptions"/>
+                        <PropertyValue Property="ArchiveFormat" Bool="true"/>
+                        <PropertyValue Property="Border" Bool="true"/>
+                        <PropertyValue Property="CoverPage" Bool="true"/>
+                        <PropertyValue Property="FitToPage" Bool="true"/>
+                        <PropertyValue Property="FontName" Bool="true"/>
+                        <PropertyValue Property="FontSize" Bool="true"/>
+                        <PropertyValue Property="Margin" Bool="true"/>
+                        <PropertyValue Property="Padding" Bool="true"/>
+                        <PropertyValue Property="Signature" Bool="true"/>
+                        <PropertyValue Property="HeaderFooter" Bool="true"/>
+                        <PropertyValue Property="ResultSizeDefault" Int="20000"/>
+                        <PropertyValue Property="ResultSizeMaximum" Int="20000"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.KeyAsSegmentSupported"/>
+                <Annotation Term="SAP__capabilities.AsynchronousRequestsSupported"/>
+            </Annotations>
+        </Schema>
+    </edmx:DataServices>
+</edmx:Edmx>

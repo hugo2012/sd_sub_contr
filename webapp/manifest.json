@@ -1,0 +1,141 @@
+{
+  "_version": "1.60.0",
+  "sap.app": {
+    "id": "com.bosch.rb1m.sd.sdsubcontr",
+    "type": "application",
+    "i18n": "i18n/i18n.properties",
+    "applicationVersion": {
+      "version": "0.0.1"
+    },
+    "title": "{{appTitle}}",
+    "description": "{{appDescription}}",
+    "resources": "resources.json",
+    "sourceTemplate": {
+      "id": "@sap/generator-fiori:basic",
+      "version": "1.18.6",
+      "toolsId": "22f5aa44-ff14-4144-a8fe-47bcc2a0c44c"
+    },
+    "dataSources": {
+      "mainService": {
+        "uri": "/sap/opu/odata4/rb1m/sd_bi_subcon_process/srvd_a2x/rb1m/sd_srv_subcon_v4/0001/",
+        "type": "OData",
+        "settings": {
+          "annotations": [],
+          "localUri": "localService/mainService/metadata.xml",
+          "odataVersion": "4.0"
+        }
+      }
+    }
+  },
+  "sap.ui": {
+    "technology": "UI5",
+    "icons": {
+      "icon": "",
+      "favIcon": "",
+      "phone": "",
+      "phone@2": "",
+      "tablet": "",
+      "tablet@2": ""
+    },
+    "deviceTypes": {
+      "desktop": true,
+      "tablet": true,
+      "phone": true
+    }
+  },
+  "sap.ui5": {
+    "flexEnabled": true,
+    "dependencies": {
+      "minUI5Version": "1.120.30",
+      "libs": {
+        "sap.m": {},
+        "sap.ui.core": {}
+      }
+    },
+    "contentDensities": {
+      "compact": true,
+      "cozy": true
+    },
+    "models": {
+      "i18n": {
+        "type": "sap.ui.model.resource.ResourceModel",
+        "settings": {
+          "bundleName": "com.bosch.rb1m.sd.sdsubcontr.i18n.i18n"
+        }
+      },
+      "filterCondData": {
+        "type": "sap.ui.model.json.JSONModel",
+        "settings": {},
+        "preload": false
+      },
+      "ItemsSet": {
+        "type": "sap.ui.model.json.JSONModel",
+        "settings": {},
+        "preload": false
+      },
+      "mainService": {
+        "dataSource": "mainService",
+        "preload": true,
+        "settings": {
+          "operationMode": "Server",
+          "autoExpandSelect": true,
+          "earlyRequests": true
+        }
+      }
+    },
+    "resources": {
+      "css": [
+        {
+          "uri": "css/style.css"
+        }
+      ]
+    },
+    "routing": {
+      "config": {
+        "routerClass": "sap.m.routing.Router",
+        "controlAggregation": "pages",
+        "controlId": "app",
+        "transition": "slide",
+        "type": "View",
+        "viewType": "XML",
+        "path": "com.bosch.rb1m.sd.sdsubcontr.view",
+        "async": true,
+        "viewPath": "com.bosch.rb1m.sd.sdsubcontr.view"
+      },
+      "routes": [
+        {
+          "name": "RouteMain",
+          "pattern": ":?query:",
+          "target": [
+            "TargetMain"
+          ]
+        },
+        {
+          "pattern": "Subconalv",
+          "name": "Subconalv",
+          "target": [
+            "Subconalv"
+          ]
+        }
+      ],
+      "targets": {
+        "TargetMain": {
+          "id": "Main",
+          "name": "Main",
+          "viewLevel": 1
+        },
+        "Subconalv": {
+          "viewName": "Subconalv",
+          "viewId": "Subconalv",
+          "viewLevel": 2
+        }
+      }
+    },
+    "rootView": {
+      "viewName": "com.bosch.rb1m.sd.sdsubcontr.view.App",
+      "type": "XML",
+      "id": "App",
+      "async": true
+    }
+  }
+}

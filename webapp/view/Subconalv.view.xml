@@ -1,0 +1,48 @@
+<mvc:View controllerName="com.bosch.rb1m.sd.sdsubcontr.controller.Subconalv" 
+	xmlns:mvc="sap.ui.core.mvc"
+		xmlns:m="sap.m"
+		xmlns="sap.ui.table"
+		xmlns:f="sap.f"
+        xmlns:core="sap.ui.core"
+        xmlns:fb="sap.ui.comp.filterbar"
+		xmlns:layout="sap.ui.layout"
+        xmlns:svm="sap.ui.comp.smartvariants"
+		height="100%">
+		<f:DynamicPage id="PageId_Subconalv" >			
+			<f:header >
+			<f:DynamicPageHeader id="_IDGenDynamicPageHeader" pinnable="false" visible="true">
+			<f:content>     
+					 <m:HBox id="_IDGenHBox1" alignItems="Start" justifyContent="Start" class="sapUiSmallMarginBottom pgTitleFont" >
+						<m:Title id="_IDGenTitle1" text="{i18n>tbl_title_subcn}"/>
+					</m:HBox>  
+			</f:content>   	
+			</f:DynamicPageHeader>	
+			</f:header>	 
+			<f:content> 
+				<Table
+				id="tblsubcon"
+				selectionMode="MultiToggle"
+				enableColumnFreeze="true"
+				enableCellFilter="true"
+				ariaLabelledBy="title"
+				rowSelectionChange=".onRowSelectionChange"
+				class = "sapUiSizeCompact"
+				threshold="100"
+				showNoData="true"				
+				>
+				<extension>
+					<m:OverflowToolbar id="_IDGenOverflowToolbar1" style="Clear">
+						<!-- <m:Title id="title" text="{i18n>tbl_title_subcn}"/> -->
+						<m:ToolbarSpacer id="_IDGenToolbarSpacer"/>
+						<m:Button id="btnCrtDlvr" text="{i18n>btnCrtDlvr}" enabled="{subconModel>/createEnable}" type="Transparent"
+						 press="onCrtDlvr"/>
+						 <m:Button id="btnStockOvr" text="{i18n>btnStockOvr}" enabled="{subconModel>/bDisplayEnable}" type="Transparent"
+						 press="onStockOvr"/>
+						<m:Button id="btnStockOrRqmts" text="{i18n>btnStockOrRqmts}" enabled="{subconModel>/bDisplayEnable}" type="Transparent"
+						 press="onStockOrRqmts"/>
+					</m:OverflowToolbar>
+				</extension>				
+			</Table>						
+			</f:content>
+		</f:DynamicPage>
+</mvc:View>

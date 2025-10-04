@@ -1,0 +1,88 @@
+<mvc:View xmlns:core="sap.ui.core" xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m"
+ controllerName="com.bosch.rb1m.sd.sdsubcontr.controller.Main"
+	xmlns:html="http://www.w3.org/1999/xhtml" xmlns:f="sap.ui.layout.form"
+	>		
+	<Page id="_IDGenPage" title="{i18n>title}">
+		<content>
+			<VBox id="_IDGenVBox" class="sapUiSmallMargin">
+				<f:SimpleForm id="_IDGenSimpleForm" editable="true" title="{i18n>formTitle}" layout="ResponsiveGridLayout"  labelSpanXL="3" labelSpanL="3"
+					labelSpanM="3" labelSpanS="12" adjustLabelSpan="false" emptySpanXL="4" emptySpanL="4" emptySpanM="4" emptySpanS="0" columnsXL="1"
+					columnsL="1" columnsM="1" singleContainerFullSize="false">
+					<f:content>
+						<Label id="_lbl_plant" text="{i18n>lbl_plant}" labelFor="idip_plant"/>
+						<Input id="idip_plant" 
+						   showValueHelp="true" submit="onPlantSubmit" 
+						   valueHelpRequest="onValueHelpRequestAuto"
+						   >
+						</Input>
+						<Label id="lbl_shipping_point" text="{i18n>lbl_shipping_point}" labelFor="idip_shipping_point"/>
+						<Input id="idip_shipping_point"
+						 showValueHelp="true" submit="onShippingPointSubmit" 
+						   valueHelpRequest="onValueHelpRequestAuto"
+						   >
+						</Input>
+						<Label id="lbl_vendor" text="{i18n>lbl_vendor}" labelFor="idip_vendor"/>
+						<MultiInput id="idip_vendor" 
+						 showValueHelp="true" submit="onVendorSubmit" 
+						   valueHelpRequest="onValueHelpRequestAuto"
+						   >
+						</MultiInput>
+						<Label id="lbl_purchase_oder" text="{i18n>lbl_purchase_oder}" labelFor="idip_purchase_oder"/>
+						<MultiInput id="idip_purchase_oder" 
+						 showValueHelp="true" submit="onPOSubmit" 
+						   valueHelpRequest="onValueHelpRequestAuto"
+						   >
+						</MultiInput>
+						<Label id="lbl_req_date" text="{i18n>lbl_req_date}" labelFor="iddate_req_date"/>
+						 <MultiInput id="iddate_req_date" name="Date"
+									editable="true"
+									enabled="true"								
+									showSuggestion="false"
+									showValueHelp="true"
+									placeholder="DD.MM.YYYY"
+									valueHelpRequest=".onVHReqDateRequested"
+									>
+							</MultiInput>		
+						<Label id="lbl_warehouse_number" text="{i18n>lbl_warehouse_number}" labelFor="idip_warehouse_number"/>
+						<Input id="idip_warehouse_number" 
+						 showValueHelp="true" submit="onwarehouse_numberSubmit" 
+						   valueHelpRequest="onValueHelpRequestAuto"
+						   >
+						</Input>
+						<Label id="lbl_storage_type" text="{i18n>lbl_storage_type}" labelFor="idip_storage_type"/>
+						<MultiInput id="idip_storage_type" 
+						 showValueHelp="true" submit="onstorage_typeSubmit" 
+						   valueHelpRequest="onValueHelpRequestAuto"
+						   >
+						</MultiInput>
+						<Label id="lbl_storage_bin" text="{i18n>lbl_storage_bin}" labelFor="idip_storage_bin"/>
+						<MultiInput id="idip_storage_bin" 
+						 showValueHelp="true" submit="onstorage_binSubmit" 
+						   valueHelpRequest="onValueHelpRequestAuto"
+						   >
+						</MultiInput>
+						<Label id="lbl_assembly_prod" text="{i18n>lbl_assembly_prod}" labelFor="idip_assembly_prod"/>
+						<MultiInput id="idip_assembly_prod" 
+						 showValueHelp="true" submit="onassembly_prodSubmit" 
+						   valueHelpRequest="onValueHelpRequestAuto"
+						   >
+						</MultiInput>
+						<Label id="lbl_component" text="{i18n>lbl_component}" labelFor="idip_component"/>
+						<MultiInput id="idip_component" 
+						 showValueHelp="true" submit="oncomponentSubmit" 
+						   valueHelpRequest="onValueHelpRequestAuto"
+						   >
+						</MultiInput>
+					</f:content>
+				</f:SimpleForm>
+			</VBox>
+		</content>
+		<footer>
+			<Bar id="_IDGenBar">
+				<contentRight>
+					<Button id="idbtnContinueTxtn" text="{i18n>btnContinueTxt}" type="Emphasized" press=".onHandleContinuePress"/>
+				</contentRight>
+			</Bar>
+		</footer>
+	</Page>
+</mvc:View>
