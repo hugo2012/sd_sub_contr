@@ -120,9 +120,15 @@ sap.ui.define([
                                             function (oData) {   
                                                // debugger;
                                                 dialogMetadata.oModel.setProperty("/valueHelpSet", []);
-                                                dialogMetadata.oModel.setProperty("/valueHelpSet", oData);
+                                                dialogMetadata.oModel.setProperty("/valueHelpSet", oData.oData);
                                                 dialogMetadata.oModel.setProperty("/FieldsSetInlineCount",  0);     
-                                                var p = oData.length - 2;
+                                                let p = 0;   
+                                                if( oData.oData.length<=100){
+                                                    p = oData.oData.length;
+                                                } 
+                                                else{
+                                                    p = oData.oCount;
+                                                }
                                                 dialogMetadata.oModel.setProperty("/FieldsSetInlineCount",  p);  
                                                 dialog.update();
                                                 dialog.setBusy(false);
@@ -137,9 +143,15 @@ sap.ui.define([
                                         function (oData) {   
                                            // debugger;
                                             dialogMetadata.oModel.setProperty("/valueHelpSet", []);
-                                            dialogMetadata.oModel.setProperty("/valueHelpSet", oData);
-                                            dialogMetadata.oModel.setProperty("/FieldsSetInlineCount",  0);     
-                                            var p = oData.length - 2;
+                                            dialogMetadata.oModel.setProperty("/valueHelpSet", oData.oData);
+                                            dialogMetadata.oModel.setProperty("/FieldsSetInlineCount",  0);  
+                                            let p = 0;   
+                                            if( oData.oData.length<=100){
+                                                p = oData.oData.length;
+                                            } 
+                                            else{
+                                                p = oData.oCount;
+                                            }
                                             dialogMetadata.oModel.setProperty("/FieldsSetInlineCount",  p);  
                                             dialog.update();
                                             dialog.setBusy(false);
@@ -154,9 +166,15 @@ sap.ui.define([
                                         function (oData) {   
                                            // debugger;
                                             dialogMetadata.oModel.setProperty("/valueHelpSet", []);
-                                            dialogMetadata.oModel.setProperty("/valueHelpSet", oData);
+                                            dialogMetadata.oModel.setProperty("/valueHelpSet", oData.oData);
                                             dialogMetadata.oModel.setProperty("/FieldsSetInlineCount",  0);     
-                                            var p = oData.length - 2;
+                                             let p = 0;   
+                                            if( oData.oData.length<=100){
+                                                p = oData.oData.length;
+                                            } 
+                                            else{
+                                                p = oData.oCount;
+                                            }
                                             dialogMetadata.oModel.setProperty("/FieldsSetInlineCount",  p);  
                                             dialog.update();
                                             dialog.setBusy(false);
@@ -171,9 +189,15 @@ sap.ui.define([
                                         function (oData) {   
                                            // debugger;
                                             dialogMetadata.oModel.setProperty("/valueHelpSet", []);
-                                            dialogMetadata.oModel.setProperty("/valueHelpSet", oData);
+                                            dialogMetadata.oModel.setProperty("/valueHelpSet", oData.oData);
                                             dialogMetadata.oModel.setProperty("/FieldsSetInlineCount",  0);     
-                                            var p = oData.length - 2;
+                                            let p = 0;   
+                                            if( oData.oData.length<=100){
+                                                p = oData.oData.length;
+                                            } 
+                                            else{
+                                                p = oData.oCount;
+                                            }
                                             dialogMetadata.oModel.setProperty("/FieldsSetInlineCount",  p);  
                                             dialog.update();
                                             dialog.setBusy(false);
@@ -188,9 +212,15 @@ sap.ui.define([
                                             function (oData) {   
                                                // debugger;
                                                 dialogMetadata.oModel.setProperty("/valueHelpSet", []);
-                                                dialogMetadata.oModel.setProperty("/valueHelpSet", oData);
+                                                dialogMetadata.oModel.setProperty("/valueHelpSet", oData.oData);
                                                 dialogMetadata.oModel.setProperty("/FieldsSetInlineCount",  0);     
-                                                var p = oData.length - 2;
+                                                let p = 0;   
+                                                if( oData.oData.length<=100){
+                                                    p = oData.oData.length;
+                                                } 
+                                                else{
+                                                    p = oData.oCount;
+                                                }
                                                 dialogMetadata.oModel.setProperty("/FieldsSetInlineCount",  p);  
                                                 dialog.update();
                                                 dialog.setBusy(false);
@@ -205,9 +235,15 @@ sap.ui.define([
                                                 function (oData) {   
                                                    // debugger;
                                                     dialogMetadata.oModel.setProperty("/valueHelpSet", []);
-                                                    dialogMetadata.oModel.setProperty("/valueHelpSet", oData);
+                                                    dialogMetadata.oModel.setProperty("/valueHelpSet", oData.oData);
                                                     dialogMetadata.oModel.setProperty("/FieldsSetInlineCount",  0);     
-                                                    var p = oData.length - 2;
+                                                    let p = 0;   
+                                                    if( oData.oData.length<=100){
+                                                        p = oData.oData.length;
+                                                    } 
+                                                    else{
+                                                        p = oData.oCount;
+                                                    }
                                                     dialogMetadata.oModel.setProperty("/FieldsSetInlineCount",  p);  
                                                     dialog.update();
                                                     dialog.setBusy(false);
@@ -222,9 +258,15 @@ sap.ui.define([
                                                 function (oData) {   
                                                    // debugger;
                                                     dialogMetadata.oModel.setProperty("/valueHelpSet", []);
-                                                    dialogMetadata.oModel.setProperty("/valueHelpSet", oData);
+                                                    dialogMetadata.oModel.setProperty("/valueHelpSet", oData.oData);
                                                     dialogMetadata.oModel.setProperty("/FieldsSetInlineCount",  0);     
-                                                    var p = oData.length - 2;
+                                                    let p = 0;   
+                                                    if( oData.oData.length<=100){
+                                                        p = oData.oData.length;
+                                                    } 
+                                                    else{
+                                                        p = oData.oCount;
+                                                    }
                                                     dialogMetadata.oModel.setProperty("/FieldsSetInlineCount",  p);  
                                                     dialog.update();
                                                     dialog.setBusy(false);
@@ -239,9 +281,15 @@ sap.ui.define([
                                                 function (oData) {   
                                                    // debugger;
                                                     dialogMetadata.oModel.setProperty("/valueHelpSet", []);
-                                                    dialogMetadata.oModel.setProperty("/valueHelpSet", oData);
+                                                    dialogMetadata.oModel.setProperty("/valueHelpSet", oData.oData);
                                                     dialogMetadata.oModel.setProperty("/FieldsSetInlineCount",  0);     
-                                                    var p = oData.length - 2;
+                                                     let p = 0;   
+                                                    if( oData.oData.length<=100){
+                                                        p = oData.oData.length;
+                                                    } 
+                                                    else{
+                                                        p = oData.oCount;
+                                                    }
                                                     dialogMetadata.oModel.setProperty("/FieldsSetInlineCount",  p);  
                                                     dialog.update();
                                                     dialog.setBusy(false);
@@ -256,9 +304,15 @@ sap.ui.define([
                                                 function (oData) {   
                                                    // debugger;
                                                     dialogMetadata.oModel.setProperty("/valueHelpSet", []);
-                                                    dialogMetadata.oModel.setProperty("/valueHelpSet", oData);
+                                                    dialogMetadata.oModel.setProperty("/valueHelpSet", oData.oData);
                                                     dialogMetadata.oModel.setProperty("/FieldsSetInlineCount",  0);     
-                                                    var p = oData.length - 2;
+                                                     let p = 0;   
+                                                    if( oData.oData.length<=100){
+                                                        p = oData.oData.length;
+                                                    } 
+                                                    else{
+                                                        p = oData.oCount;
+                                                    }
                                                     dialogMetadata.oModel.setProperty("/FieldsSetInlineCount",  p);  
                                                     dialog.update();
                                                     dialog.setBusy(false);
@@ -336,12 +390,13 @@ sap.ui.define([
                         oTable.setSelectionMode(sap.ui.table.SelectionMode.MultiToggle);                      
                         oTable.setEnableSelectAll(true);
                         oTable.setEnableBusyIndicator(true);
-                        //oTable.attachRowsUpdated(this.fnOnFirstTableUpdated , this);                
+                        oTable.removeAllExtension();
+                        oTable.attachRowsUpdated(this.fnOnFirstTableUpdated , this);                
                     setTimeout(function () {  
                        // debugger;
                           config.model.setProperty("/FieldsSetInlineCount",  0);     
                           config.model.setProperty("/FieldsSetInlineCount",  dialogMetadata.inlineCount);
-                          //oTable.setVisibleRowCount(dialogMetadata.inlineCount)                  
+                          //oTable.setVisibleRowCount(dialogMetadata.inlineCount)     
                           oTable.setModel(config.model);
                            if (oTable.bindRows) {
                                //debugger;
@@ -474,10 +529,12 @@ sap.ui.define([
                 if(sTotal >= 100)
                 {
                   // debugger; 
-                   var sTitle = "Items (More than 500)" ;
+                   var sTitle = "Items (More than 100)" ;
                    e.oSource.setTitle(sTitle);
-                 // this.getView().byId("__title1").setText(sTitle);
-                   //console.log("update table finished");
+                }
+                else{
+                  var sTitle = "Items (" + sTotal + ")" ;
+                   e.oSource.setTitle(sTitle);
                 }
             }
 		}  ,

@@ -2,9 +2,9 @@ sap.ui.define([
 "sap/ui/core/format/NumberFormat",
 "sap/m/Token"
 ], function (NumberFormat,Token) {
-	"use strict";
+  "use strict";
     return {
-            
+
             /**
          * Returns the correct traffic light icon based on the input value.
          * @param {string} sStatus The status value from the data model.
@@ -20,7 +20,7 @@ sap.ui.define([
                 case "Error":
                     return "sap-icon://status-negative";
                 default:
-                    return "sap-icon://status-inactive";
+                    return "sap-icon://dropdown";
             }
         },
          statusColor: function (sStatus) {
@@ -35,7 +35,7 @@ sap.ui.define([
                     return "Neutral";
             }
         },
-        
+
         statusText: function (sStatus) {
             switch (sStatus) {
                 case "Success":
@@ -48,18 +48,23 @@ sap.ui.define([
                     return "Unknown";
             }
         } ,
-        fnFormatNumeric: function(a,b){
+        fnFormatNumeric: function(a,b,c){
            // debugger;
               var oFloatNumberFormat = NumberFormat.getFloatInstance({
                     maxFractionDigits: 0,
                     minFractionDigits : 0,
                     groupingEnabled: true
-                } , sap.ui.getCore().getConfiguration().getLocale());   
-
+                } , sap.ui.getCore().getConfiguration().getLocale());
+             if(c==99){
+                return a;
+            }
+            if( b =="IsMain"){
+                 return a;
+              }
             var numberRegex = /^\d+$/;
             var t = a;
             // Validate numbers
-            var k = numberRegex.test(t); 
+            var k = numberRegex.test(t);
 
             if(a){
                if(k == true) {
@@ -69,48 +74,124 @@ sap.ui.define([
                 else{
                      return a;
                 }
-               
+
                }
                else{
                 return a;
                }
-            }    
+            }
             else{
                 return a;
             }
-            
+
         }   ,
+         fnFormatNumericRet: function(a,b,c){
+           // debugger;
+              var oFloatNumberFormat = NumberFormat.getFloatInstance({
+                    maxFractionDigits: 0,
+                    minFractionDigits : 0,
+                    groupingEnabled: true
+                } , sap.ui.getCore().getConfiguration().getLocale());
+
+            if(c==99){
+                return false;
+            }
+             if( b =="IsMain"){
+                 return false;
+              }
+            var numberRegex = /^\d+$/;
+            var t = a;
+            // Validate numbers
+            var k = numberRegex.test(t);
+
+            if(a){
+                return k;
+            }
+            else{
+                return false;
+            }
+
+        }   ,
+        fnIsFillColorSubHdr: function(a,b,c,d){
+            if(b=="IsMain"){
+                if(c==99){
+                    if(d.length > 0){
+                        return true
+                    }
+                }
+            }
+            return false;
+        },
         fnIsNumeric: function (str) {
             if (typeof str != "string") return false
-            return !isNaN(str) && 
-                    !isNaN(parseFloat(str)) 
+            return !isNaN(str) &&
+                    !isNaN(parseFloat(str))
         },
         _fnValidateNumber:function(e)
         {
             var numberRegex = /^\d+$/;
             var t = e.getSource().getValue();
             // Validate numbers
-            var a = numberRegex.test(t); 
+            var a = numberRegex.test(t);
             if(a== true)
                 e.getSource().setValue(t);
             else
-                e.getSource().setValue("0")  ;                                                   
+                e.getSource().setValue("")  ;
         } ,
-          fnFormatType: function(a,b){
+          fnFormatType: function(a,b,c){
            // debugger;
-            var numberRegex = /^\d+$/;
-            var t = a;
+            //var numberRegex = /^\d+$/;
+           // var t = a;
             // Validate numbers
-            var k = numberRegex.test(t); 
-            if(a){
-            if(k == true) {
-                return sap.m.InputType.Number;
-            }    
-            else{
+               if(a=="Delivery Qty"){
+                //debugger;
                 return sap.m.InputType.Text;
+               }
+              if( c ==99){
+                 return sap.m.InputType.Text;
+              }
+               if( b =="IsMain"){
+                 return sap.m.InputType.Text;
+              }
+            if( b ==true){
+                 return sap.m.InputType.Email;
+              }
+            return sap.m.InputType.Text;
+            // var k = numberRegex.test(t);
+            // console.log(t);
+            // if(a){
+            // if(k == true) {
+            //     return sap.m.InputType.Number;
+            // }
+            // else{
+            //     return sap.m.InputType.Text;
+            // }
+
+        } ,
+
+        fnFormatEditDelQty: function(a,b,c){
+            if(b==false){
+                if(c!= 99){
+                    if(a){
+                        if(a.length > 1){
+                            return false;//
+                        }
+                        else{
+                            return true;
+                        }
+                    }
+                    else{
+                        return true;
+                    }
+                }
+                else{
+                    return false;
+                }
             }
-            
-        } }  ,
+            else{
+                return false;
+            }
+        },
          fnFormatDateOdata: function (e) {
             if (e) {
                 let t = sap.ui.core.format.DateFormat.getDateInstance({style: "medium", pattern: "yyyy-MM-ddTHH:mm:ss"});
@@ -142,6 +223,12 @@ sap.ui.define([
             }
             if (isNaN(new Date(e))) {
                 return ""
+            }
+            var strDate= "";
+            strDate = e.toString();
+            if(strDate.includes("00:00.000Z") || strDate.includes("T00:00:00.0000000Z")){
+
+                return e;
             }
             var t = e.getDate();
             var a = e.getMonth() + 1;
@@ -218,6 +305,44 @@ sap.ui.define([
             f.push(l);
             let s = f;
             return s
+        },
+        /**
+     * Convert SAP UI5 date range option + date(s) into text operation
+     * @param {string} sOperation - Range option code (e.g. "EQ", "GT", "GE", "LT", "LE", "BT")
+     * @param {Date} oValue1 - First date value
+     * @param {Date} [oValue2] - Second date value (only for "BT")
+     * @returns {string} - Text operation like ">20.11.2025" or "20.11.2025...25.11.2025"
+     */
+     convertRangeOperationToText: function(sOperation, oValue1, oValue2) {
+        //const oFormat = sap.ui.core.format.DateFormat.getDateInstance({ pattern: "dd.MM.yyyy" });
+        const sDate1 = oValue1 ;
+        const sDate2 = oValue2 ;
+
+        switch (sOperation) {
+            case "EQ": // Equal
+                return sDate1;
+
+            case "GT": // Greater than
+                return `>${sDate1}`;
+
+            case "GE": // Greater or equal
+                return `≥${sDate1}`;
+
+            case "LT": // Less than
+                return `<${sDate1}`;
+
+            case "LE": // Less or equal
+                return `≤${sDate1}`;
+
+            case "BT": // Between
+                return `${sDate1}...${sDate2}`;
+
+            case "NE": // Not equal
+                return `≠${sDate1}`;
+
+            default:
+                return "";
         }
-   }; 
-}); 
+    }
+   };
+});

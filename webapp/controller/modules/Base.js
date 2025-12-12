@@ -7,10 +7,10 @@ sap.ui.define([
 	"use strict";
 	let _oService = Service; // Service is shared between all controllers
 	let _oRouteCallBack = {};
-	return Controller.extend("com.bosch.rb1m.sd.sdsubcontr.controller.modules.Base", {
+	return Controller.extend("com.bosch.rb1m.sd.sd_subcontr.controller.modules.Base", {
 		_oStoredBeforeData: null,
-		onInit: function () {
-			_oService.init(this);
+		onInit:  function () {
+			 _oService.init(this);
 		},
 		getService: function () {
 			//debugger;
@@ -80,7 +80,7 @@ sap.ui.define([
 				return sap.ui.Device.system.phone;
 			},
 			// Warning message handling
-		showMultileLineWarningMessageBox: function (sMainMessage, aErrorMessage) {
+			showMultileLineWarningMessageBox: function (sMainMessage, aErrorMessage,aErrorMesType) {
 			if (!aErrorMessage || aErrorMessage.length === 0) {
 				return;
 			}
@@ -92,12 +92,80 @@ sap.ui.define([
 				sDetail += `<li>${sMessage}</li>`
 			}
 			sDetail += "</ul>";
-
-			MessageBox.warning((sMainMessage), {
+			if(aErrorMesType == "W"){
+				MessageBox.warning((sMainMessage), {
 				title: "Warning",
 				details: sDetail
-			});
+				});
+			}
+			else if(aErrorMesType == "E"){
+				MessageBox.error((sMainMessage), {
+				title: "Error",
+				details: sDetail
+				});
+			}
+			else{
+				MessageBox.success((sMainMessage), {
+				title: "Sucess",
+				details: sDetail
+				});
+			}
+			
 		},
+		 showMultileLineSuccessMessageBox: function (sMainMessage, aErrorMessage,_messageType) {
+			if (!aErrorMessage || aErrorMessage.length === 0) {
+				return;
+			}
+
+			// Build error message
+			let sDetail = "";
+			sDetail += "<ul>";
+			for (let sMessage of aErrorMessage) {
+				sDetail += `<li>${sMessage.MsgContent}</li>`
+			}
+			sDetail += "</ul>";
+            if(_messageType == "S"){
+                sap.m.MessageBox.success((sMainMessage), {
+				title: "Success",
+				details: sDetail
+			    });
+            }
+            else{
+               sap.m.MessageBox.error((sMainMessage), {
+				title: "Error",
+				details: sDetail
+			    });
+            }
+
+		},
+		 _fnHandleErrorExe: function (_aMessage) {
+            this.setBusy(false);
+            var _message = "";
+            if (_aMessage.length > 0) {
+                _message = _aMessage;
+            } else {
+                _message = this.getResourceBundle().getText("dialog.error.load_data.failed");
+            }
+            sap.m.MessageBox.show(_message, {
+                icon: sap.m.MessageBox.Icon.ERROR,
+                title: "Error"
+            });
+        },
+        _fnHandleSuccessExe: function (_aMessage) {
+            this.setBusy(false);
+            var _message = "";
+            if (_aMessage) {
+                _message = _aMessage;
+            } else {
+                _message = this.getResourceBundle().getText("dialog.success.create.delivery.complete");
+            }
+
+            sap.m.MessageBox.show(_message, {
+                icon: sap.m.MessageBox.Icon.SUCCESS,
+                title: "Success"
+            });
+            
+        },
 		fnSetBusyIndicatorOnDetailControls: function (oControl, bShowBusy) {
 			if (oControl) {
 				var iDelay = 0;

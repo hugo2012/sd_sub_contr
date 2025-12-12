@@ -56,6 +56,10 @@ sap.ui.define([
 		{
 			return new Promise((resolve, reject) => {
 				let oModel = _oController.getOwnerComponent().getModel("mainService");
+				var _oData = {
+					oData: [],
+					oCount:0
+				};
 				//ListBinding
 				var oListBinding = oModel.bindList(
 					"/xRB1MxSD_C_VENDOR",                              //sPath
@@ -66,250 +70,366 @@ sap.ui.define([
 					// 	"$expand": "navigationProperty",
 					// 	"$select": "property1,property2"
 					// }
+					{
+						"$count": true
+					}
 				);
 				//Fetching a List of Entities:
 				oListBinding.requestContexts().then((oListContext) => {
 					let oData = oListContext.map(rowContext => rowContext.getObject());	
 					//Handle success
-					resolve(oData);
-					debugger;
+					//resolve(oData);
+					_oData.oData = oData;
+					//debugger;
 				})
 				.catch((oError) => {
 					//Handle error
 					reject(oError);
-					debugger;
+					//debugger;
 				});
+			   oListBinding. getHeaderContext().requestProperty("$count").then((oCount) =>{
+					let _oCount = oCount;
+					_oData.oCount = _oCount;
+					resolve(_oData);
+				})		
 			});
 		},
 		getPlantSet :function(aFilter)
 		{
 			return new Promise((resolve, reject) => {
 				let oModel = _oController.getOwnerComponent().getModel("mainService");
+				var _oData = {
+					oData: [],
+					oCount:0
+				};
 				//ListBinding
 				var oListBinding = oModel.bindList(
 					"/xRB1MxSD_C_PLANT",                         //sPath
 					null,                                       //oContext
 					null,                                       //vSorters - Dynamic Sorters 
-					aFilter                                    //vFilters - Dynamic Filters 
+					aFilter,                                    //vFilters - Dynamic Filters 
 					 //{                                           //mParameters                   
 					// 	"$expand": "navigationProperty",
 					// 	"$select": "property1,property2"
 					// }
+					{
+						"$count": true
+					}
 				);
 				//Fetching a List of Entities:
 				oListBinding.requestContexts().then((oListContext) => {
 					let oData = oListContext.map(rowContext => rowContext.getObject());	
 					//Handle success
-					resolve(oData);
+					//resolve(oData);
+					_oData.oData = oData;
 				})
 				.catch((oError) => {
 					//Handle error
 					reject(oError);
-					debugger;
+					//debugger;
 				});
+				 oListBinding. getHeaderContext().requestProperty("$count").then((oCount) =>{
+					let _oCount = oCount;
+					_oData.oCount = _oCount;
+					resolve(_oData);
+				}) 	
 			});
 		},
 		getShippingPointSet :function(aFilter)
 		{
 			return new Promise((resolve, reject) => {
 				let oModel = _oController.getOwnerComponent().getModel("mainService");
+				var _oData = {
+					oData: [],
+					oCount:0
+				};
 				//ListBinding
 				var oListBinding = oModel.bindList(
 					"/xRB1MxSD_C_SHIPPOINT",                              //sPath
 					null,                                       //oContext
 					null,                                       //vSorters - Dynamic Sorters 
-					aFilter                                       //vFilters - Dynamic Filters 
+					aFilter ,                                      //vFilters - Dynamic Filters 
 					// {                                           //mParameters                   
 					// 	"$expand": "navigationProperty",
 					// 	"$select": "property1,property2"
 					// }
+					{
+						"$count": true
+					}
 				);
 				//Fetching a List of Entities:
 				oListBinding.requestContexts().then((oListContext) => {
 					let oData = oListContext.map(rowContext => rowContext.getObject());	
 					//Handle success
-					resolve(oData);
+					//resolve(oData);
+					_oData.oData = oData;
 				})
 				.catch((oError) => {
 					//Handle error
 					reject(oError);
-					debugger;
+					//debugger;
 				});
+				oListBinding. getHeaderContext().requestProperty("$count").then((oCount) =>{
+					let _oCount = oCount;
+					_oData.oCount = _oCount;
+					resolve(_oData);
+				})
 			});
 		},
 		getPONoSet :function(aFilter)
 		{
 			return new Promise((resolve, reject) => {
 				let oModel = _oController.getOwnerComponent().getModel("mainService");
+				var _oData = {
+					oData: [],
+					oCount:0
+				};	
 				//ListBinding
 				var oListBinding = oModel.bindList(
 					"/xRB1MxSD_C_PURCORD",                              //sPath
 					null,                                       //oContext
 					null,                                       //vSorters - Dynamic Sorters 
-					aFilter                                     //vFilters - Dynamic Filters 
+					aFilter,                                     //vFilters - Dynamic Filters 
 					// {                                           //mParameters                   
 					// 	"$expand": "navigationProperty",
 					// 	"$select": "property1,property2"
 					// }
+					{
+						"$count": true
+					}
 				);
 				//Fetching a List of Entities:
 				oListBinding.requestContexts().then((oListContext) => {
 					let oData = oListContext.map(rowContext => rowContext.getObject());	
 					//Handle success
-					resolve(oData);
+					//resolve(oData);
+					_oData.oData = oData;
 				})
 				.catch((oError) => {
 					//Handle error
 					reject(oError);
-					debugger;
+					//debugger;
 				});
+				oListBinding. getHeaderContext().requestProperty("$count").then((oCount) =>{
+					let _oCount = oCount;
+					_oData.oCount = _oCount;
+					resolve(_oData);
+				})	
 			});
 		},
 		getWareHNoSet :function(aFilter)
 		{
 			return new Promise((resolve, reject) => {
 				let oModel = _oController.getOwnerComponent().getModel("mainService");
+				var _oData = {
+					oData: [],
+					oCount:0
+				};
 				//ListBinding
 				var oListBinding = oModel.bindList(
 					"/xRB1MxSD_C_WAREHNO",                              //sPath
 					null,                                       //oContext
 					null,                                       //vSorters - Dynamic Sorters 
-					aFilter                                       //vFilters - Dynamic Filters 
+					aFilter,                                       //vFilters - Dynamic Filters 
 					// {                                           //mParameters                   
 					// 	"$expand": "navigationProperty",
 					// 	"$select": "property1,property2"
 					// }
+					{
+						"$count": true
+					}
 				);
 				//Fetching a List of Entities:
 				oListBinding.requestContexts().then((oListContext) => {
 					let oData = oListContext.map(rowContext => rowContext.getObject());	
 					//Handle success
-					resolve(oData);
+					//resolve(oData);
+					_oData.oData = oData;
 				})
 				.catch((oError) => {
 					//Handle error
 					reject(oError);
-					debugger;
+					//debugger;
 				});
+			   oListBinding. getHeaderContext().requestProperty("$count").then((oCount) =>{
+					let _oCount = oCount;
+					_oData.oCount = _oCount;
+					resolve(_oData);
+				})	
 			});
 		},
 		getStorTypSet: function (aFilter) {		
 			//debugger;	
 			return new Promise((resolve, reject) => {
 				let oModel = _oController.getOwnerComponent().getModel("mainService");
+				var _oData = {
+					oData: [],
+					oCount:0
+				};
 				//debugger;
 				//ListBinding
 				var oListBinding = oModel.bindList(
-					"/xRB1MxSD_C_STORTYP",                              //sPath
+					"/xRB1MxSD_C_STORTYP",                      //sPath
 					null,                                       //oContext
 					null,                                       //vSorters - Dynamic Sorters 
-					aFilter                                      //vFilters - Dynamic Filters 
-					// {                                           //mParameters                   
+					aFilter ,                                   //vFilters - Dynamic Filters 
+					// {                                        //mParameters                   
 					// 	"$expand": "navigationProperty",
 					// 	"$select": "property1,property2"
 					// }
+					{
+						"$count": true
+					}
+
 				);
 				//Fetching a List of Entities:
-				oListBinding.requestContexts().then((oListContext) => {
+				let iSkip = 0;
+				let iTop = 100
+				oListBinding.requestContexts(iSkip, iTop).then((oListContext) => {
 					let oData = oListContext.map(rowContext => rowContext.getObject());	
+					_oData.oData = oData;
 					//Handle success
-					resolve(oData);
-					debugger;
+					//resolve(oData);
+					//debugger;
 				})
 				.catch((oError) => {
 					//Handle error
 					reject(oError);
-					debugger;
+					
 				});
-			});
+				oListBinding. getHeaderContext().requestProperty("$count").then((oCount) =>{
+					let _oCount = oCount;
+					_oData.oCount = _oCount;
+					resolve(_oData);
+				})
+				});
 		},
 		getStorBinSet: function (aFilter) {		
 			//debugger;	
 			return new Promise((resolve, reject) => {
 				let oModel = _oController.getOwnerComponent().getModel("mainService");
+				var _oData = {
+					oData: [],
+					oCount:0
+				};
 				//debugger;
 				//ListBinding
 				var oListBinding = oModel.bindList(
-					"/xRB1MxSD_C_STORBIN",                              //sPath
+					"/xRB1MxSD_C_STORBIN",                      //sPath
 					null,                                       //oContext
 					null,                                       //vSorters - Dynamic Sorters 
-					aFilter                                     //vFilters - Dynamic Filters 
-					// {                                           //mParameters                   
+					aFilter,                                     //vFilters - Dynamic Filters 
+					// {                                        //mParameters                   
 					// 	"$expand": "navigationProperty",
 					// 	"$select": "property1,property2"
 					// }
+					{
+						"$count": true
+					}
 				);
 				//Fetching a List of Entities:
 				oListBinding.requestContexts().then((oListContext) => {
 					let oData = oListContext.map(rowContext => rowContext.getObject());	
 					//Handle success
-					resolve(oData);
-					debugger;
+					//resolve(oData);
+					_oData.oData = oData;
+					//debugger;
 				})
 				.catch((oError) => {
 					//Handle error
 					reject(oError);
-					debugger;
+					//debugger;
 				});
+				oListBinding. getHeaderContext().requestProperty("$count").then((oCount) =>{
+					let _oCount = oCount;
+					_oData.oCount = _oCount;
+					resolve(_oData);
+				})
 			});
 		},
 		getAssePrdSet: function (aFilter) {		
 			//debugger;	
 			return new Promise((resolve, reject) => {
 				let oModel = _oController.getOwnerComponent().getModel("mainService");
+				var _oData = {
+					oData: [],
+					oCount:0
+				};
 				//debugger;
 				//ListBinding
 				var oListBinding = oModel.bindList(
-					"/xRB1MxSD_C_ASSEPRD",                              //sPath
+					"/xRB1MxSD_C_ASSEPRD",                       //sPath
 					null,                                       //oContext
 					null,                                       //vSorters - Dynamic Sorters 
-					aFilter                                      //vFilters - Dynamic Filters 
-					// {                                           //mParameters                   
+					aFilter,                                     //vFilters - Dynamic Filters 
+					// {                                        //mParameters                   
 					// 	"$expand": "navigationProperty",
 					// 	"$select": "property1,property2"
 					// }
+					{
+						"$count": true
+					}
 				);
 				//Fetching a List of Entities:
 				oListBinding.requestContexts().then((oListContext) => {
 					let oData = oListContext.map(rowContext => rowContext.getObject());	
 					//Handle success
-					resolve(oData);
-					debugger;
+					//resolve(oData);
+					_oData.oData = oData;
+					//debugger;
 				})
 				.catch((oError) => {
 					//Handle error
 					reject(oError);
-					debugger;
+					//debugger;
 				});
+				oListBinding. getHeaderContext().requestProperty("$count").then((oCount) =>{
+					let _oCount = oCount;
+					_oData.oCount = _oCount;
+					resolve(_oData);
+				})
 			});
 		},
 		getCompoSet :function(aFilter)
 		{
 			return new Promise((resolve, reject) => {
 				let oModel = _oController.getOwnerComponent().getModel("mainService");
+				var _oData = {
+					oData: [],
+					oCount:0
+				};
 				//ListBinding
 				var oListBinding = oModel.bindList(
-					"/xRB1MxSD_C_COMPO",                              //sPath
+					"/xRB1MxSD_C_COMPO",                         //sPath
 					null,                                       //oContext
 					null,                                       //vSorters - Dynamic Sorters 
-					aFilter                                      //vFilters - Dynamic Filters 
-					// {                                           //mParameters                   
+					aFilter,                                    //vFilters - Dynamic Filters 
+					// {                                       //mParameters                   
 					// 	"$expand": "navigationProperty",
 					// 	"$select": "property1,property2"
 					// }
+					{
+						"$count": true
+					}
 				);
 				//Fetching a List of Entities:
 				oListBinding.requestContexts().then((oListContext) => {
 					let oData = oListContext.map(rowContext => rowContext.getObject());	
 					//Handle success
-					resolve(oData);
-					debugger;
+					//resolve(oData);
+					_oData.oData = oData;
+					//debugger;
 				})
 				.catch((oError) => {
 					//Handle error
 					reject(oError);
-					debugger;
+					//debugger;
 				});
+				oListBinding. getHeaderContext().requestProperty("$count").then((oCount) =>{
+					let _oCount = oCount;
+					_oData.oCount = _oCount;
+					resolve(_oData);
+				})
 			});
 		},		
 		oDataCreate: function (oModel, sPath, oDeepEntityData) {

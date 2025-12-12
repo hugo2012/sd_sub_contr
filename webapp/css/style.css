@@ -3,7 +3,7 @@
 /* In your CSS file */
 .hideCheckbox {
     pointer-events: none; /* Prevents click events */
-    opacity: 0.4; /* Makes it visually appear disabled */
+    opacity: 0.4;  /* Makes it visually appear disabled */
     visibility: hidden;   
 }
 .div[aria-level='2']{
@@ -22,4 +22,63 @@
 .sapUiTableHeaderRow {
      background-color: #e8eff6 !important;
 }
+.sapMLnk.sapMLnkSubtle {
+    color: #131e29;
+    text-decoration: none; 
+}
+.cussapMLnkSubtle {
+    color: #131e29;
+    text-decoration: underline; 
+}
+.sapMLnk:visited {
+    color: #131e29;
+}
+.myCustomLinkClass {
+        text-decoration: wavy !important; /* Removes the underline */
+        color: #131e29 !important; /* Keeps the default text color, preventing change on hover */
+        /* You can add other properties here, e.g., background-color: transparent !important; */
+        pointer-events: none;
+    }
 
+ /* In your custom CSS file (e.g., style.css) */
+/* Custom CSS for a sticky sap.ui.table header */
+/* The header container has a fixed position */
+.myTable .sapUiTable.sapUiTableSelModeNone .sapUiTableSelCol {
+  position: sticky !important;
+  top: 0;
+  z-index: 2; /* Ensures the header is on top of the scrolling rows */
+  background-color: var(--sapBackgroundColor); /* Add a background color to prevent content from showing through */
+}
+
+/* Header cells within the header container */
+.myTable .sapUiTable.sapUiTableSelModeNone .sapUiTableCol {
+  position: sticky !important;
+  top: 0;
+  z-index: 2;
+}
+
+/* Multi-header cell styling */
+.myTable .sapUiTable.sapUiTableSelModeNone .sapUiTableMnuRow > td:nth-child(n) {
+  position: sticky !important;
+  top: 0;
+  z-index: 2;
+}
+
+/* Correct positioning for multiple header rows (optional) */
+.myTable .sapUiTable.sapUiTableSelModeNone .sapUiTableMnuRow:nth-child(2) > td:nth-child(n) {
+  top: 2.25rem; /* Adjust this value to the height of the first header row */
+}
+.sapUiTableContentRow.sapUiTableRowSel {
+    background-color: #F9EFDB !important;
+}
+.assemblyPrd {
+    background-color: #F9EFDB !important;
+}
+
+.noneEdit {
+    /* background-color: #f5f6f7;  */
+    background-color: "lightslategrey" !important;
+    font-family: "72-SemiboldDuplex", "72-SemiboldDuplexfull", "72", "72full", Arial, Helvetica, sans-serif;
+    font-weight: normal;
+    font-size: 11px;
+}

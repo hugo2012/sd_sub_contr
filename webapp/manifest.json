@@ -1,7 +1,7 @@
 {
   "_version": "1.60.0",
   "sap.app": {
-    "id": "com.bosch.rb1m.sd.sdsubcontr",
+    "id": "com.bosch.rb1m.sd.sd_subcontr",
     "type": "application",
     "i18n": "i18n/i18n.properties",
     "applicationVersion": {
@@ -46,10 +46,11 @@
   "sap.ui5": {
     "flexEnabled": true,
     "dependencies": {
-      "minUI5Version": "1.120.30",
+      "minUI5Version": "1.120.25",
       "libs": {
         "sap.m": {},
-        "sap.ui.core": {}
+        "sap.ui.core": {},
+        "sap.ui.fl": {}
       }
     },
     "contentDensities": {
@@ -60,7 +61,7 @@
       "i18n": {
         "type": "sap.ui.model.resource.ResourceModel",
         "settings": {
-          "bundleName": "com.bosch.rb1m.sd.sdsubcontr.i18n.i18n"
+          "bundleName": "com.bosch.rb1m.sd.sd_subcontr.i18n.i18n"
         }
       },
       "filterCondData": {
@@ -98,9 +99,8 @@
         "transition": "slide",
         "type": "View",
         "viewType": "XML",
-        "path": "com.bosch.rb1m.sd.sdsubcontr.view",
-        "async": true,
-        "viewPath": "com.bosch.rb1m.sd.sdsubcontr.view"
+        "path": "com.bosch.rb1m.sd.sd_subcontr.view",
+        "async": true
       },
       "routes": [
         {
@@ -132,10 +132,9 @@
       }
     },
     "rootView": {
-      "viewName": "com.bosch.rb1m.sd.sdsubcontr.view.App",
+      "viewName": "com.bosch.rb1m.sd.sd_subcontr.view.App",
       "type": "XML",
-      "id": "App",
-      "async": true
+      "id": "App"
     }
   }
 }

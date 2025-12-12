@@ -31,25 +31,30 @@ sap.ui.define([
                // debugger;
                 var o = this.getInputColorMode(),
                     r;
-                let k = false;
-                if(this.getProperty("type") == sap.m.InputType.Text) {
-                    k = true;
-                }
-                if(k == false){
-                    if (this.getEditable()) 
-                        r = o.edit;
-                    else if (this.$().parentsUntil("table").last().parent()[0].className.indexOf("sapUiTableCtrlFixed") >= 0) 
-                        r = o.fixed;
-                    else 
-                        r = o.normal;               
-                }
-                else
-                {
+              
+  /*                if(this.getProperty("type") == sap.m.InputType.Text) {
                     if (this.getEditable()) 
                     r = o.edit;
                     else 
-                    r = o.fixed;               
-                }
+                    r = o.fixed;  
+                 }
+                 else  */
+                if(this.getProperty("type") == sap.m.InputType.Text) {
+                    if (this.getEditable()) 
+                        r = o.edit;
+                    // else if (this.$().parentsUntil("table").last().parent()[0].className.indexOf("sapUiTableCtrlFixed") >= 0) 
+                    //     r = o.fixed;
+                     else 
+                        r = o.fixed;           
+                 }
+                 else if(this.getProperty("type") == sap.m.InputType.Email) {
+                    //edit
+                     r = o.assembly;
+                 }
+                 else if( this.getProperty("type") == sap.m.InputType.Number){
+                    r = o.noneEdit;
+                 }
+               
                 this.$().css("width", "100%");
                 this.$().css("padding", "0");
                 this.$().children().css("border", "0");

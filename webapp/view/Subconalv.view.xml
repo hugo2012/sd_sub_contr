@@ -1,48 +1,64 @@
-<mvc:View controllerName="com.bosch.rb1m.sd.sdsubcontr.controller.Subconalv" 
+<mvc:View controllerName="com.bosch.rb1m.sd.sd_subcontr.controller.Subconalv" 
 	xmlns:mvc="sap.ui.core.mvc"
 		xmlns:m="sap.m"
+		xmlns:columnmenu="sap.m.table.columnmenu"
 		xmlns="sap.ui.table"
 		xmlns:f="sap.f"
         xmlns:core="sap.ui.core"
         xmlns:fb="sap.ui.comp.filterbar"
 		xmlns:layout="sap.ui.layout"
         xmlns:svm="sap.ui.comp.smartvariants"
-		height="100%">
+		xmlns:rowmodes="sap.ui.table.rowmodes"
+		xmlns:sap.ui.fl="sap.ui.fl"
+		xmlns:sap.ui.dt="sap.ui.dt"
+		xmlns:vm="sap.ui.fl.variants"
+		 xmlns:app="http://schemas.sap.com/sapui5/extension/sap.ui.core.CustomData/1"
+		>
 		<f:DynamicPage id="PageId_Subconalv" >			
-			<f:header >
-			<f:DynamicPageHeader id="_IDGenDynamicPageHeader" pinnable="false" visible="true">
-			<f:content>     
-					 <m:HBox id="_IDGenHBox1" alignItems="Start" justifyContent="Start" class="sapUiSmallMarginBottom pgTitleFont" >
-						<m:Title id="_IDGenTitle1" text="{i18n>tbl_title_subcn}"/>
-					</m:HBox>  
-			</f:content>   	
-			</f:DynamicPageHeader>	
-			</f:header>	 
-			<f:content> 
-				<Table
-				id="tblsubcon"
-				selectionMode="MultiToggle"
-				enableColumnFreeze="true"
-				enableCellFilter="true"
-				ariaLabelledBy="title"
-				rowSelectionChange=".onRowSelectionChange"
-				class = "sapUiSizeCompact"
-				threshold="100"
-				showNoData="true"				
-				>
-				<extension>
-					<m:OverflowToolbar id="_IDGenOverflowToolbar1" style="Clear">
-						<!-- <m:Title id="title" text="{i18n>tbl_title_subcn}"/> -->
+			<f:title>
+				<f:DynamicPageTitle id="_IDGenDynamicPageTitle1">
+					<f:heading>
+					</f:heading>				
+					<f:content>
+					</f:content>	
+					 <f:actions>
 						<m:ToolbarSpacer id="_IDGenToolbarSpacer"/>
 						<m:Button id="btnCrtDlvr" text="{i18n>btnCrtDlvr}" enabled="{subconModel>/createEnable}" type="Transparent"
-						 press="onCrtDlvr"/>
-						 <m:Button id="btnStockOvr" text="{i18n>btnStockOvr}" enabled="{subconModel>/bDisplayEnable}" type="Transparent"
-						 press="onStockOvr"/>
+						press="onCrtDlvr"/>
+						<m:Button id="btnStockOvr" text="{i18n>btnStockOvr}" enabled="{subconModel>/bDisplayEnable}" type="Transparent"
+						press="onStockOvr"/>
 						<m:Button id="btnStockOrRqmts" text="{i18n>btnStockOrRqmts}" enabled="{subconModel>/bDisplayEnable}" type="Transparent"
-						 press="onStockOrRqmts"/>
-					</m:OverflowToolbar>
-				</extension>				
-			</Table>						
-			</f:content>
+						press="onStockOrRqmts"/>
+					</f:actions>		
+				</f:DynamicPageTitle>
+			</f:title>
+			<f:content> 	
+				<Table			
+						id="tblsubcon"
+						selectionMode="MultiToggle"
+						enableColumnFreeze="true"
+						enableCellFilter="true"
+						ariaLabelledBy="title"
+						rowSelectionChange=".onRowSelectionChange"			
+						showNoData="true"
+						columnResize="onColumnResize" columnMove="onColumnMove" 
+						rowMode="Auto" 
+						sap.ui.fl:flexibility="sap/m/flexibility/EngineFlex" 
+						>	
+				<extension>
+                <m:OverflowToolbar id="_IDGenOverflowToolbar1" visible="false">
+                    <m:Title id="title" text=""/>
+                    <m:ToolbarSeparator id="_IDGenToolbarSeparator"/>
+                    <vm:VariantManagement id="p13nVm" for="tblsubcon"/>
+                    <m:ToolbarSpacer id="_IDGenToolbarSpacer1"/>
+                    <m:Button id="_IDGenButton" icon="sap-icon://action-settings" press="openPersoDialog"/>
+                </m:OverflowToolbar>
+				</extension>
+				<dependents>
+					<columnmenu:Menu id="menu">
+					</columnmenu:Menu>
+				</dependents>
+					</Table>	
+			</f:content> 				
 		</f:DynamicPage>
 </mvc:View>
