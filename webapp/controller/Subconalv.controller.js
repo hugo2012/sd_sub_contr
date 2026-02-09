@@ -110,13 +110,12 @@ sap.ui.define([
                     //return;
                 }              
                 // create mock sample
-              //  this.fnCreateMockData();
+               this.fnCreateMockData();
             }.bind(this), function (oError) {
                 this.setBusy(false);
                 this._fnHandleErrorExe();
             }.bind(this)); 
-            //Call mock data
-            // this.fnCreateMockData();
+
         },
         fnCreateMockData: function(){
             this.getModel("subconModel").setProperty("/bDisplayEnable", true);
@@ -570,7 +569,7 @@ sap.ui.define([
                                                 )
                                             });   
                                          break;    
-                                        case "SUPP_NO":
+                                        /* case "SUPP_NO":
                                         s = new sap.ui.table.Column({
                                                 width: _width,
                                                 headerMenu: "menu",
@@ -602,7 +601,7 @@ sap.ui.define([
                                                     }
                                                 )
                                             });   
-                                         break;        
+                                         break;   */      
                                     default:
                                         s = new sap.ui.table.Column({
                                                 width: _width,
@@ -1065,25 +1064,28 @@ sap.ui.define([
                 var data1 = {};
                 //main item data
                 var rowData = aTblItemSet[aItems[k]];
-                deepDynamicTable.Header.forEach(ocolumn => {
-                    i = i + 1;
-                    var c = "Col" + ocolumn.HeaderIndex;
-                  
-                    if (parseInt(ocolumn.HeaderIndex) >= 18){
-                      data1[ocolumn.HeaderName] =  aTblItemSet[aItems[k]][ocolumn.HeaderName];
-                    }
-                    else{
-                          data1[c] = aTblItemSet[aItems[k]][ocolumn.HeaderName];
-                    }
-                       
-                });
-                //Add MainIndex,HeaderIndex,ItemIndex.
-                _payload_deep_rt._ItemsNav.push(data1);
+                if( rowData.IsMain === true){
+                     deepDynamicTable.Header.forEach(ocolumn => {
+                        i = i + 1;
+                        var c = "Col" + ocolumn.HeaderIndex;
+                    
+                        if (parseInt(ocolumn.HeaderIndex) >= 18){
+                        data1[ocolumn.HeaderName] =  aTblItemSet[aItems[k]][ocolumn.HeaderName];
+                        }
+                        else{
+                            data1[c] = aTblItemSet[aItems[k]][ocolumn.HeaderName];
+                        }
+                        
+                    });
+                    //Add MainIndex,HeaderIndex,ItemIndex.
+                    _payload_deep_rt._ItemsNav.push(data1);
+                }             
+
                 // sub-item data
                 aTblItemSet.forEach(_rowData => {
                     let data1 = {};
                     let _CheckQty = false;
-                    if (_rowData.ParentId == rowData.RootId && rowData.RootId != 99) {
+                    if (_rowData.ParentId == rowData.RootId && _rowData.IsMain === false && rowData.IsMain === true && rowData.RootId != 99) {
                         deepDynamicTable.Header.forEach(ocolumn => {
                             i = i + 1;
                             var c = "Col" + ocolumn.HeaderIndex;                      
