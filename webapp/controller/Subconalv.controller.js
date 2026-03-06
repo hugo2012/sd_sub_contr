@@ -7,31 +7,28 @@ sap.ui.define([
     "sap/ui/core/routing/History",
     "sap/ui/table/rowmodes/Fixed",
     'sap/m/p13n/Engine',
-	'sap/m/p13n/SelectionController',
+    'sap/m/p13n/SelectionController',
     'sap/m/p13n/MetadataHelper',
     'sap/m/table/ColumnWidthController',
     "com/bosch/rb1m/sd/sd_subcontr/model/models"
-], function (JSONModel, Base, coreLibrary, Formatter, Input,History,FixedRowMode,
-    Engine,SelectionController,MetadataHelper,ColumnWidthController,models
-    ) {
+], function (JSONModel, Base, coreLibrary, Formatter, Input, History, FixedRowMode, Engine, SelectionController, MetadataHelper, ColumnWidthController, models) {
     "use strict";
     var ValueState = coreLibrary.ValueState;
     return Base.extend("com.bosch.rb1m.sd.sd_subcontr.controller.Subconalv", {
-        onInit:  function () {
+        onInit: function () {
             Base.prototype.onInit.apply(this);
             this.oSemanticPage = this.byId("idObjectPage");
             this.fnInitializeSettingsModel();
             this._oUIDynamicTable = this.byId("tblsubcon");
-            this._oUIDynamicTable.bindRows("subconModel>/ItemsSet");    
+            this._oUIDynamicTable.bindRows("subconModel>/ItemsSet");
             this._isSizeLimit = 500;
             this.getRouter().getRoute("Subconalv").attachMatched(this.onRouteMatched, this);
             this._flagRenderTable = false;
             this._oUIDynamicTable.attachEvent("rowsUpdated", this.onRowsUpdated, this);
             this._startUpParemeters = this.getOwnerComponent().getModel("startupParameters").getProperty("/startupParameters");
-            //this._registerForP13n();
+            // this._registerForP13n();
         },
-        onExit: function () {
-           // this.fnInitializeSettingsModel();
+        onExit: function () { // this.fnInitializeSettingsModel();
         },
         /* Settings Model */
         fnInitializeSettingsModel: function () { // debugger;
@@ -61,21 +58,19 @@ sap.ui.define([
         },
         onRouteMatched: function () {
             var a = this.getOwnerComponent().getModel("filterCondData").getData();
-            if (a.Plant==undefined) {
+            if (a.Plant == undefined) {
                 this.onNavBack();
-                return;               
+                return;
             } else {
-               this.onLoadData(a);
+                this.onLoadData(a);
             }
         },
-        navBack: function() {
+        navBack: function () {
             debugger;
         },
-         onNavBack: function () {
- 
+        onNavBack: function () {
             var oHistory = sap.ui.core.routing.History.getInstance();
             var sPreviousHash = oHistory.getPreviousHash();
-
             if (sPreviousHash !== undefined) {
                 window.history.go(-1);
             } else {
@@ -92,75 +87,73 @@ sap.ui.define([
             // debugger;
             this.setBusy(true);
             this.getService().queryProcessDeepEntity(_payload_deep_rt).then(function (aData) {
-                 this.setBusy(false);
+                this.setBusy(false);
                 if (aData._ItemsNav.length > 0) {
                     let deepDynamicTable = this._fnBuildDeepDynamicTable(aData);
                     this.getModel("subconModel").setProperty("/deepDynamicTable", deepDynamicTable);
                     this.getModel("subconModel").setProperty("/bDisplayEnable", true);
                     this.fnBuildDynamicTableData(deepDynamicTable);
-                   
-                }else{
+
+                } else {
                     let deepDynamicTable = this._fnBuildDeepDynamicTable(aData);
                     this.getModel("subconModel").setProperty("/deepDynamicTable", deepDynamicTable);
                     this.fnBuildDynamicTableData(deepDynamicTable);
                     this.getModel("subconModel").setProperty("/bDisplayEnable", false);
                     let _sMessage = this.getResourceBundle().getText("dialog.error.nodata.found");
                     this._fnHandleErrorExe(_sMessage);
-                    //this.onNavBack();
-                    //return;
-                }              
+                    // this.onNavBack();
+                    // return;
+                }
                 // create mock sample
-               this.fnCreateMockData();
+                this.fnCreateMockData();
             }.bind(this), function (oError) {
                 this.setBusy(false);
                 this._fnHandleErrorExe();
-            }.bind(this)); 
+            }.bind(this));
 
         },
-        fnCreateMockData: function(){
+        fnCreateMockData: function () {
             this.getModel("subconModel").setProperty("/bDisplayEnable", true);
-            var deepDynamicTable = models.fnCreateMockData();            
+            var deepDynamicTable = models.fnCreateMockData();
             this.getModel("subconModel").setProperty("/deepDynamicTable", deepDynamicTable);
             this.fnBuildDynamicTableData(deepDynamicTable);
             this.setBusy(false);
-            // create mock sample data   
-            },
-        _fnBuildDeepDynamicTable: function(aData){
+            // create mock sample data
+        },
+        _fnBuildDeepDynamicTable: function (aData) {
             var deepDynamicTable = {
                 Header: [],
                 Items: [],
                 SubHeader: [],
                 SubItems: []
             };
-              if (aData._HeaderNav) {
-                    if (aData._HeaderNav.length > 0) {
-                        aData._HeaderNav.forEach(eHeaderNav => {
-                            if (eHeaderNav.IsMain == true) {
-                                deepDynamicTable.Header.push(eHeaderNav);
-                            }
-                            else {
-                                deepDynamicTable.SubHeader.push(eHeaderNav);
-                            }
-                        });
-                    }
+            if (aData._HeaderNav) {
+                if (aData._HeaderNav.length > 0) {
+                    aData._HeaderNav.forEach(eHeaderNav => {
+                        if (eHeaderNav.IsMain == true) {
+                            deepDynamicTable.Header.push(eHeaderNav);
+                        } else {
+                            deepDynamicTable.SubHeader.push(eHeaderNav);
+                        }
+                    });
                 }
-                if (aData._ItemsNav) {
-                    if (aData._ItemsNav.length > 0) {
-                        aData._ItemsNav.forEach(eItemsNav => {
-                            if (eItemsNav.IsMain == true) {
-                                deepDynamicTable.Items.push(eItemsNav);
-                            }
-                            else {
-                                deepDynamicTable.SubItems.push(eItemsNav);
-                            }
-                        });
-                    }
+            }
+            if (aData._ItemsNav) {
+                if (aData._ItemsNav.length > 0) {
+                    aData._ItemsNav.forEach(eItemsNav => {
+                        if (eItemsNav.IsMain == true) {
+                            deepDynamicTable.Items.push(eItemsNav);
+                        } else {
+                            deepDynamicTable.SubItems.push(eItemsNav);
+                        }
+                    });
                 }
-                return deepDynamicTable;
+            }
+            return deepDynamicTable;
         },
-       
+
         fnBuildDynamicTableData: function (oData) {
-            if (oData.Header.length === 0 ) {
+            if (oData.Header.length === 0) {
                 this.getModel("subconModel").setProperty("/ItemsSet", []);
                 return;
             }
@@ -170,12 +163,11 @@ sap.ui.define([
             var aRows = [];
             aHeaders = aHeader;
             for (var i = 0; i < aData.length; i++) {
-                if(i > this._isSizeLimit){
+                if (i > this._isSizeLimit) {
                     break;
-                }
-                else{
+                } else {
                     aRows.push(aData[i]);
-                }            
+                }
             }
             var oTable = {
                 "headerDetails": aHeaders,
@@ -183,137 +175,199 @@ sap.ui.define([
             };
             var _dataMainItemSet = this._fnGenerateDataSet(oData);
             this.getModel("subconModel").setProperty("/ItemsSet", _dataMainItemSet);
-            if(_dataMainItemSet.length > this._isSizeLimit){
+            if (_dataMainItemSet.length > this._isSizeLimit) {
                 this._oUIDynamicTable.setRowMode(sap.ui.table.rowmodes.Type.Auto);
-            }
-            else{
+            } else {
                 this._oUIDynamicTable.setRowMode(sap.ui.table.rowmodes.Type.Auto);
             }
             this._fnBuildTable(oTable);
-           // init persionlizationengine
-           //this._registerForP13n();
+            // init persionlizationengine
+            // this._registerForP13n();
 
         },
-        _registerForP13n: function() {
-			const oTable = this.byId("tblsubcon");
+        _registerForP13n: function () {
+            const oTable = this.byId("tblsubcon");
+            this.oMetadataHelper = new MetadataHelper([
+                {
+                    key: 'TRAFF_LGT',
+                    label: 'Traffic Light',
+                    path: 'Traffic Light'
+                },
+                {
+                    key: 'SUPP_NO',
+                    label: 'Supplier Number',
+                    path: 'Supplier Number'
+                },
+                {
+                    key: 'SUPP_NAME',
+                    label: 'Supplier Name',
+                    path: 'Supplier Name'
+                },
+                {
+                    key: 'SUPP_CITY',
+                    label: 'Supplier City',
+                    path: 'Supplier City'
+                }, {
+                    key: 'SUPP_CTRY',
+                    label: 'Supplier Country',
+                    path: 'Supplier Country'
+                }, {
+                    key: 'PO_NO',
+                    label: 'Purchase Document',
+                    path: 'Purchase Document'
+                }, {
+                    key: 'ASSE_PRD',
+                    label: 'Assembly Product',
+                    path: 'Assembly Product'
+                }, {
+                    key: 'PRD_DESCR',
+                    label: 'Product Description',
+                    path: 'Product Description'
+                }, {
+                    key: 'COMPONENT',
+                    label: 'Component',
+                    path: 'Component'
+                }, {
+                    key: 'COMP_DESCR',
+                    label: 'Component Description',
+                    path: 'Component Description'
+                }, {
+                    key: 'STOCK',
+                    label: 'Stock',
+                    path: 'Stock'
+                }, {
+                    key: 'UOM',
+                    label: 'Unit Of Measure',
+                    path: 'Unit Of Measure'
+                }, {
+                    key: 'SUM_HU',
+                    label: 'Sum. HU',
+                    path: 'Sum. HU'
+                }, {
+                    key: 'STOCK_SUPP',
+                    label: 'Stock At Supplier',
+                    path: 'Stock At Supplier'
+                }, {
+                    key: 'BEN',
+                    label: '',
+                    path: ''
+                }, {
+                    key: 'DEMAND',
+                    label: 'Demand',
+                    path: 'Demand'
+                }, {
+                    key: 'SHIP_TO',
+                    label: 'Ship To Party',
+                    path: 'Ship To Party'
+                }, {
+                    key: 'IsMain',
+                    label: 'Is Main',
+                    path: 'Is Main'
+                }, {
+                    key: 'RootId',
+                    label: 'Root ID',
+                    path: 'Root ID'
+                }, {
+                    key: 'ParentId',
+                    label: 'Parent ID',
+                    path: 'Parent ID'
+                }, {
+                    key: 'MainIndex',
+                    label: 'Main Index',
+                    path: 'Main Index'
+                }, {
+                    key: 'HeaderIndex',
+                    label: 'Header Index',
+                    path: 'Header Index'
+                }, {
+                    key: 'ItemsIndex',
+                    label: 'Items Index',
+                    path: 'Items Index'
+                }, {
+                    key: 'EditDelQty',
+                    label: 'Edit Del.Qty',
+                    path: 'Edit Del.Qty'
+                }
 
-			this.oMetadataHelper = new MetadataHelper([
-                {key: 'TRAFF_LGT', label: 'Traffic Light', path: 'Traffic Light'},
-                {key: 'SUPP_NO', label: 'Supplier Number', path: 'Supplier Number'},
-                {key: 'SUPP_NAME', label: 'Supplier Name', path: 'Supplier Name'},
-                {key: 'SUPP_CITY', label: 'Supplier City', path: 'Supplier City'},
-                {key: 'SUPP_CTRY', label: 'Supplier Country', path: 'Supplier Country'}, 
-                {key: 'PO_NO', label: 'Purchase Document', path: 'Purchase Document'},
-                {key: 'ASSE_PRD', label: 'Assembly Product', path: 'Assembly Product'},
-                {key: 'PRD_DESCR', label: 'Product Description', path: 'Product Description'},
-                {key: 'COMPONENT', label: 'Component', path: 'Component'},
-                {key: 'COMP_DESCR', label: 'Component Description', path: 'Component Description'},
-                {key: 'STOCK', label: 'Stock', path: 'Stock'},
-                {key: 'UOM', label: 'Unit Of Measure', path: 'Unit Of Measure'},
-                {key: 'SUM_HU', label: 'Sum. HU', path: 'Sum. HU'}, 
-                {key: 'STOCK_SUPP', label: 'Stock At Supplier', path: 'Stock At Supplier'}, 
-                {key: 'BEN', label: '', path: ''}, 
-                {key: 'DEMAND', label: 'Demand', path: 'Demand'},
-                {key: 'SHIP_TO', label: 'Ship To Party', path: 'Ship To Party'},
-                {key: 'IsMain', label: 'Is Main', path: 'Is Main'},
-                {key: 'RootId', label: 'Root ID', path: 'Root ID'},
-                {key: 'ParentId', label: 'Parent ID', path: 'Parent ID'} ,
-                {key: 'MainIndex', label: 'Main Index', path: 'Main Index'},
-                {key: 'HeaderIndex', label: 'Header Index', path: 'Header Index'},
-                {key: 'ItemsIndex', label: 'Items Index', path: 'Items Index'},
-                {key: 'EditDelQty', label: 'Edit Del.Qty', path: 'Edit Del.Qty'}
-
-			]);
-
-			this._mIntialWidth = {
-                "TRAFF_LGT":  "3rem",
-                "SUPP_NO":  "3.5rem",
-                "SUPP_NAME":  "3.5rem",
-                "SUPP_CITY":  "3.5rem",
-                "SUPP_CTRY":  "3.5rem",
-                "PO_NO":  "4rem",
-                "ASSE_PRD":  "6rem",
-                "PRD_DESCR":  "6rem",
+            ]);
+            this._mIntialWidth = {
+                "TRAFF_LGT": "3rem",
+                "SUPP_NO": "3.5rem",
+                "SUPP_NAME": "3.5rem",
+                "SUPP_CITY": "3.5rem",
+                "SUPP_CTRY": "3.5rem",
+                "PO_NO": "4rem",
+                "ASSE_PRD": "6rem",
+                "PRD_DESCR": "6rem",
                 "COMPONENT": "6rem",
                 "COMP_DESCR": "6rem",
-                "STOCK": "4rem",             
+                "STOCK": "4rem",
                 "UOM": "4rem",
                 "SUM_HU": "4rem",
-                "STOCK_SUPP":"4rem",
+                "STOCK_SUPP": "4rem",
                 "BEN": "3rem",
                 "DEMAND": "4rem",
-                "SHIP_TO": "6rem"     
-			};
+                "SHIP_TO": "6rem"
+            };
             Engine.getInstance().register(oTable, {
                 helper: this.oMetadataHelper,
                 controller: {
-                    Columns: new SelectionController({
-                        targetAggregation: "columns",
-                        control: oTable
-                    }),
+                    Columns: new SelectionController(
+                        {targetAggregation: "columns", control: oTable}
+                    ),
                     // Sorter: new SortController({
                     //     control: oTable
                     // }),
                     // Groups: new GroupController({
                     //     control: oTable
                     // }),
-                     ColumnWidth: new ColumnWidthController({
-                        control: oTable
-                     })
+                    ColumnWidth: new ColumnWidthController(
+                        {control: oTable}
+                    )
                 }
-			});
+            });
 
-			Engine.getInstance().attachStateChange(this.handleStateChange, this);
-         },
-        openPersoDialog: function(oEvt) {
-			const oTable = this._oUIDynamicTable;
+            Engine.getInstance().attachStateChange(this.handleStateChange, this);
+        },
+        openPersoDialog: function (oEvt) {
+            const oTable = this._oUIDynamicTable;
+            Engine.getInstance().show(oTable, ["Columns"], {
+                contentHeight: "35rem",
+                contentWidth: "32rem",
+                source: oEvt.getSource()
+            });
+        },
+        _getKey: function (oControl) {
+            return oControl.data("p13nKey");
+        },
 
-			Engine.getInstance().show(oTable, ["Columns"], {
-				contentHeight: "35rem",
-				contentWidth: "32rem",
-				source: oEvt.getSource()
-			});
-		},
-        _getKey: function(oControl) {
-			return oControl.data("p13nKey");
-		},
+        handleStateChange: function (oEvt) {
+            const oTable = oEvt.getParameter("control");
+            const oState = oEvt.getParameter("state");
+            if (! oState) {
+                return;
+            }
+            oTable.getColumns().forEach(function (oColumn) {
 
-		handleStateChange: function(oEvt) {
-			const oTable = oEvt.getParameter("control");
-			const oState = oEvt.getParameter("state");
+                // const sKey = oColumn.data("p13nKey");
+                // const sColumnWidth = oState.ColumnWidth[sKey];
 
-			if (!oState) {
-				return;
-			}
+                // oColumn.setWidth(sColumnWidth || this._mIntialWidth[sKey]);
 
-			oTable.getColumns().forEach(function(oColumn) {
-
-				//const sKey = oColumn.data("p13nKey");
-				//const sColumnWidth = oState.ColumnWidth[sKey];
-
-				//oColumn.setWidth(sColumnWidth || this._mIntialWidth[sKey]);
-
-				oColumn.setVisible(false);
-				//oColumn.setSortOrder(CoreLibrary.SortOrder.None);
-			}.bind(this));
-
-			oState.Columns.forEach(function(oProp, iIndex) {
-				const oCol = oTable.getColumns().find((oColumn) => oColumn.data("p13nKey") === oProp.key);
-				if(oProp.key=="IsMain" || oProp.key=="RootId" || oProp.key=="ParentId" || oProp.key=="MainIndex"  
-                  || oProp.key=="HeaderIndex" || oProp.key=="ItemsIndex" || oProp.key=="EditDelQty"       
-                 )
-                 {
-                     oCol.setVisible(false);
-                 }
-                 else{
-                     oCol.setVisible(true);
-                 }               
-				oTable.removeColumn(oCol);
-				oTable.insertColumn(oCol, iIndex);
-			}.bind(this));
-
-		},
-        _fnGenerateDataSet:function(oData){
+                oColumn.setVisible(false);
+                // oColumn.setSortOrder(CoreLibrary.SortOrder.None);
+            }.bind(this));
+            oState.Columns.forEach(function (oProp, iIndex) {
+                const oCol = oTable.getColumns().find((oColumn) => oColumn.data("p13nKey") === oProp.key);
+                if (oProp.key == "IsMain" || oProp.key == "RootId" || oProp.key == "ParentId" || oProp.key == "MainIndex" || oProp.key == "HeaderIndex" || oProp.key == "ItemsIndex" || oProp.key == "EditDelQty") {
+                    oCol.setVisible(false);
+                } else {
+                    oCol.setVisible(true);
+                } oTable.removeColumn(oCol);
+                oTable.insertColumn(oCol, iIndex);
+            }.bind(this));
+        },
+        _fnGenerateDataSet: function (oData) {
             var aData = oData.Items;
             var aHeader = oData.Header;
             var aHeaders = [];
@@ -322,23 +376,21 @@ sap.ui.define([
             var aDataSub = oData.SubItems;
             var aRowsSub = [];
             let i = 0;
-            for ( i = 0; i < aDataSub.length; i++) {
-                if(i > this._isSizeLimit){
+            for (i = 0; i < aDataSub.length; i++) {
+                if (i > this._isSizeLimit) {
                     break;
+                } else {
+                    aRowsSub.push(aDataSub[i]);
                 }
-                else{
-                     aRowsSub.push(aDataSub[i]);
-                }             
             }
             aHeaders = aHeader;
             i = 0;
-            for ( i = 0; i < aData.length; i++) {
-                if(i > this._isSizeLimit){
+            for (i = 0; i < aData.length; i++) {
+                if (i > this._isSizeLimit) {
                     break;
+                } else {
+                    aRows.push(aData[i]);
                 }
-                else{
-                     aRows.push(aData[i]);
-                }              
             }
             var _dataMainItemSet = this.fnReGenerateOdataSet(aHeaders, aRows, aSubHeaders, aRowsSub);
             return _dataMainItemSet;
@@ -356,62 +408,63 @@ sap.ui.define([
                         headerMenu: "menu",
                         resizable: true,
                         label: new sap.m.Label(
-                            { text: _aFixedColumn[t].HeaderValue, tooltip: _aFixedColumn[t].HeaderValue }
+                            {text: _aFixedColumn[t].HeaderValue, tooltip: _aFixedColumn[t].HeaderValue}
                         ),
-                        template: new sap.ui.core.Icon({
-                            src: {
-                                path: b,
-                                formatter: function (v) {
-                                    return Formatter.statusIcon(v);
-                                }
-                            },
-                            size: "1rem",
-                            color: {
-                                path: b,
-                                formatter: function (v) {
-                                    return Formatter.statusColor(v);
-                                }
-                            },
-                            tooltip: {
-                                path: b,
-                                formatter: function (v) {
-                                    return Formatter.statusText(v);
+                        template: new sap.ui.core.Icon(
+                            {
+                                src: {
+                                    path: b,
+                                    formatter: function (v) {
+                                        return Formatter.statusIcon(v);
+                                    }
+                                },
+                                size: "1rem",
+                                color: {
+                                    path: b,
+                                    formatter: function (v) {
+                                        return Formatter.statusColor(v);
+                                    }
+                                },
+                                tooltip: {
+                                    path: b,
+                                    formatter: function (v) {
+                                        return Formatter.statusText(v);
+                                    }
                                 }
                             }
-                        })
+                        )
                     });
-                    s.data("p13nKey",_aFixedColumn[t].HeaderName) ;
+                    s.data("p13nKey", _aFixedColumn[t].HeaderName);
                     this._oUIDynamicTable.addColumn(s)
-                }
-                else {
+                } else {
                     switch (_aFixedColumn[t].HeaderName) {
                         case "IsMain":
                             // code block
                             s = new sap.ui.table.Column({
                                 width: "auto",
-                                visible: false,
+                                visible: _aFixedColumn[t].Visible,
                                 headerMenu: "menu",
-                                 resizable: true,
+                                resizable: true,
                                 label: new sap.m.Label(
-                                    { text: _aFixedColumn[t].HeaderValue, tooltip: _aFixedColumn[t].HeaderValue }
+                                    {text: _aFixedColumn[t].HeaderValue, tooltip: _aFixedColumn[t].HeaderValue}
                                 ),
                                 template: new sap.m.Text(
-                                    { text: a }
+                                    {text: a}
                                 )
                             });
                             break;
-                         case "RootId":
+                        case "RootId":
                             // code block
                             s = new sap.ui.table.Column({
                                 width: "100%",
-                                visible: false,
+                                visible: _aFixedColumn[t].Visible,
                                 headerMenu: "menu",
-                                 resizable: true,
+                                resizable: true,
                                 label: new sap.m.Label(
-                                    { text: _aFixedColumn[t].HeaderValue, tooltip: _aFixedColumn[t].HeaderValue }
+                                    {text: _aFixedColumn[t].HeaderValue, tooltip: _aFixedColumn[t].HeaderValue}
                                 ),
                                 template: new sap.m.Text(
-                                    { text: a }
+                                    {text: a}
                                 )
                             });
                             break;
@@ -419,67 +472,82 @@ sap.ui.define([
                             // code block
                             s = new sap.ui.table.Column({
                                 width: "100%",
-                                visible: false,
+                                visible: _aFixedColumn[t].Visible,
                                 headerMenu: "menu",
-                                 resizable: true,
+                                resizable: true,
                                 label: new sap.m.Label(
-                                    { text: _aFixedColumn[t].HeaderValue, tooltip: _aFixedColumn[t].HeaderValue }
+                                    {text: _aFixedColumn[t].HeaderValue, tooltip: _aFixedColumn[t].HeaderValue}
                                 ),
                                 template: new sap.m.Text(
-                                    { text: a }
+                                    {text: a}
                                 )
                             });
-                            break; 
-                         case "MainIndex":
+                            break;
+                        case "MainIndex":
                             // code block
                             s = new sap.ui.table.Column({
                                 width: "100%",
-                                visible: false,
+                                visible: _aFixedColumn[t].Visible,
                                 headerMenu: "menu",
-                                 resizable: true,
+                                resizable: true,
                                 label: new sap.m.Label(
-                                    { text: _aFixedColumn[t].HeaderValue, tooltip: _aFixedColumn[t].HeaderValue }
+                                    {text: _aFixedColumn[t].HeaderValue, tooltip: _aFixedColumn[t].HeaderValue}
                                 ),
                                 template: new sap.m.Text(
-                                    { text: a }
+                                    {text: a}
                                 )
                             });
-                            break;  
-                         case "HeaderIndex":
+                            break;
+                        case "HeaderIndex":
                             // code block
                             s = new sap.ui.table.Column({
                                 width: "100%",
-                                visible: false,
+                                visible: _aFixedColumn[t].Visible,
                                 headerMenu: "menu",
-                                 resizable: true,
+                                resizable: true,
                                 label: new sap.m.Label(
-                                    { text: _aFixedColumn[t].HeaderValue, tooltip: _aFixedColumn[t].HeaderValue }
+                                    {text: _aFixedColumn[t].HeaderValue, tooltip: _aFixedColumn[t].HeaderValue}
                                 ),
                                 template: new sap.m.Text(
-                                    { text: a }
+                                    {text: a}
                                 )
                             });
-                            break;      
+                            break;
                         case "ItemsIndex":
                             // code block
                             s = new sap.ui.table.Column({
                                 width: "100%",
-                                visible: false,
+                                visible: _aFixedColumn[t].Visible,
                                 headerMenu: "menu",
-                                 resizable: true,
+                                resizable: true,
                                 label: new sap.m.Label(
-                                    { text: _aFixedColumn[t].HeaderValue, tooltip: _aFixedColumn[t].HeaderValue }
+                                    {text: _aFixedColumn[t].HeaderValue, tooltip: _aFixedColumn[t].HeaderValue}
                                 ),
                                 template: new sap.m.Text(
-                                    { text: a }
+                                    {text: a}
                                 )
                             });
-                            break;   
-                          case "EditDelQty":
+                            break;
+                        case "EditDelQty":
                             // code block
                             s = new sap.ui.table.Column({
                                 width: "100%",
-                                visible: false,
+                                visible: _aFixedColumn[t].Visible,
+                                headerMenu: "menu",
+                                resizable: true,
+                                label: new sap.m.Label(
+                                    {text: _aFixedColumn[t].HeaderValue, tooltip: _aFixedColumn[t].HeaderValue}
+                                ),
+                                template: new sap.m.Text(
+                                    {text: a}
+                                )
+                            });
+                            break;
+                            /*  case "RequirementDate":
+                            // code block
+                            s = new sap.ui.table.Column({
+                                width: "100%",
+                                visible: _aFixedColumn[t].Visible,
                                  headerMenu: "menu",
                                  resizable: true,
                                 label: new sap.m.Label(
@@ -489,86 +557,75 @@ sap.ui.define([
                                     { text: a }
                                 )
                             });
-                            break;           
+                            break;  */
                         default:
-                             let _width = "5rem";
+                            let _width = "5rem";
                             // code block
-                            if(sap.ui.Device.resize.width >=585 && sap.ui.Device.resize.height >=456){
+                            if (sap.ui.Device.resize.width >= 585 && sap.ui.Device.resize.height >= 456) {
                                 _width = "100%";
-                            }
-                            else{
-                                   switch (_aFixedColumn[t].HeaderName) {
-                                        case "COMPONENT":
-                                            _width = "6rem"
-                                            break;
-                                        case "STOCK":
-                                            _width = "4rem"
-                                            break;
-                                        case "UOM":
-                                            _width = "4rem"
-                                            break;
-                                        case "SUM_HU":
-                                            _width = "4rem"
-                                            break;
-                                        case "STOCK_SUPP":
-                                            _width = "4rem"
-                                            break;
-                                        case "BEN":
-                                            _width = "3rem"
-                                            break;
-                                        case "DEMAND":
-                                            _width = "4rem"
-                                            break;
-                                        case "SHIP_TO":
-                                            _width = "6rem"
-                                            break;
-                                        case "SUPP_CTRY":
-                                            _width = "3.5rem"
-                                            break;
-                                    }
-                            }
-                           
-                         
-                            if (_aFixedColumn[t].HeaderName != "SHIP_TO") {
-
+                            } else {
                                 switch (_aFixedColumn[t].HeaderName) {
-                                    case "STOCK":
-                                        s = new sap.ui.table.Column({
-                                                width: _width,
-                                                headerMenu: "menu",
-                                                resizable: true,
-                                                label: new sap.m.Label(
-                                                    { text: _aFixedColumn[t].HeaderValue, tooltip: _aFixedColumn[t].HeaderValue }
-                                                ),
-                                                template: new sap.m.Link(
-                                                    {
-                                                        text: {
-                                                            parts: [
-                                                                { path: b },
-                                                                { path: 'subconModel>IsMain' },
-                                                                { path: 'subconModel>RootId' }
-                                                                 
-                                                            ],
-                                                            formatter: function (n, l,p) {
-                                                                  this.removeStyleClass("cussapMLnkSubtle");
-                                                                  this.removeStyleClass("myCustomLinkClass");    
-                                                                if(Formatter.fnFormatNumericRet(n,l,p) == true){
-                                                                   this.addStyleClass("cussapMLnkSubtle");
-                                                                }
-                                                                else{
-                                                                      this.addStyleClass("myCustomLinkClass");                                                       
-                                                                }
-                                                                return Formatter.fnFormatNumeric(n, l,p);
+                                    case "COMPONENT": _width = "6rem"
+                                        break;
+                                    case "STOCK": _width = "4rem"
+                                        break;
+                                    case "UOM": _width = "4rem"
+                                        break;
+                                    case "SUM_HU": _width = "4rem"
+                                        break;
+                                    case "STOCK_SUPP": _width = "4rem"
+                                        break;
+                                    case "BEN": _width = "3rem"
+                                        break;
+                                    case "DEMAND": _width = "4rem"
+                                        break;
+                                    case "SHIP_TO": _width = "6rem"
+                                        break;
+                                    case "SUPP_CTRY": _width = "3.5rem"
+                                        break;
+                                }
+                            }
+                            if (_aFixedColumn[t].HeaderName != "SHIP_TO") {
+                                switch (_aFixedColumn[t].HeaderName) {
+                                    case "STOCK": s = new sap.ui.table.Column({
+                                            width: _width,
+                                            headerMenu: "menu",
+                                            resizable: true,
+                                            label: new sap.m.Label(
+                                                {text: _aFixedColumn[t].HeaderValue, tooltip: _aFixedColumn[t].HeaderValue}
+                                            ),
+                                            template: new sap.m.Link(
+                                                {
+                                                    text: {
+                                                        parts: [
+                                                            {
+                                                                path: b
+                                                            }, {
+                                                                path: 'subconModel>IsMain'
+                                                            }, {
+                                                                path: 'subconModel>RootId'
                                                             }
-                                                        },
-                                                        press: function (e) {
-                                                            this._fnHandleLinkPress(e);
-                                                        }.bind(this),
-                                                        subtle: false
-                                                    }
-                                                )
-                                            });   
-                                         break;    
+
+                                                        ],
+                                                        formatter: function (n, l, p) {
+                                                            this.removeStyleClass("cussapMLnkSubtle");
+                                                            this.removeStyleClass("myCustomLinkClass");
+                                                            if (Formatter.fnFormatNumericRet(n, l, p) == true) {
+                                                                this.addStyleClass("cussapMLnkSubtle");
+                                                            } else {
+                                                                this.addStyleClass("myCustomLinkClass");
+                                                            }
+                                                            return Formatter.fnFormatNumeric(n, l, p);
+                                                        }
+                                                    },
+                                                    press: function (e) {
+                                                        this._fnHandleLinkPress(e);
+                                                    }.bind(this),
+                                                    subtle: false
+                                                }
+                                            )
+                                        });
+                                        break;
                                         /* case "SUPP_NO":
                                         s = new sap.ui.table.Column({
                                                 width: _width,
@@ -601,56 +658,53 @@ sap.ui.define([
                                                     }
                                                 )
                                             });   
-                                         break;   */      
-                                    default:
-                                        s = new sap.ui.table.Column({
-                                                width: _width,
-                                                headerMenu: "menu",
-                                                resizable: true,
-                                                label: new sap.m.Label(
-                                                    { text: _aFixedColumn[t].HeaderValue, tooltip: _aFixedColumn[t].HeaderValue }
-                                                ),
-                                                template: new sap.m.Text(
-                                                    {
-                                                         text: a
-                                                        
-                                                    }
-                                                )
-                                            });
-                                    }                              
-                            }
-                            else {
-                                 s = new sap.ui.table.Column({
+                                         break;   */
+                                    default: s = new sap.ui.table.Column({
+                                            width: _width,
+                                            headerMenu: "menu",
+                                            resizable: true,
+                                            label: new sap.m.Label(
+                                                {text: _aFixedColumn[t].HeaderValue, tooltip: _aFixedColumn[t].HeaderValue}
+                                            ),
+                                            template: new sap.m.Text(
+                                                {text: a}
+                                            )
+                                        });
+                                }
+                            } else {
+                                s = new sap.ui.table.Column({
                                     width: _width,
                                     headerMenu: "menu",
                                     resizable: true,
                                     label: new sap.m.Label(
-                                        { text: _aFixedColumn[t].HeaderValue, tooltip: _aFixedColumn[t].HeaderValue }
+                                        {text: _aFixedColumn[t].HeaderValue, tooltip: _aFixedColumn[t].HeaderValue}
                                     ),
                                     template: new Input(
                                         {
-                                            value: a,                                         
+                                            value: a,
                                             type: {
                                                 parts: [
-                                                    { path: b },
-                                                    { path: 'subconModel>IsMain' },
-                                                    { path: 'subconModel>RootId' },
-                                                    { path: 'subconModel>EditDelQty' }
+                                                    {
+                                                        path: b
+                                                    }, {
+                                                        path: 'subconModel>IsMain'
+                                                    }, {
+                                                        path: 'subconModel>RootId'
+                                                    }, {
+                                                        path: 'subconModel>EditDelQty'
+                                                    }
                                                 ],
-                                                formatter: function (n, l,p,g) {
-                                                    this.removeStyleClass("noneEdit"); 
-                                                    if(g==false && l == false && p !=99){
-                                                        //noneEdit
-                                                         this.addStyleClass("noneEdit"); 
-                                                          return sap.m.InputType.Number
+                                                formatter: function (n, l, p, g) {
+                                                    this.removeStyleClass("noneEdit");
+                                                    if (g == false && l == false && p != 99) { // noneEdit
+                                                        this.addStyleClass("noneEdit");
+                                                        return sap.m.InputType.Number
+                                                    } else {
+                                                        return Formatter.fnFormatType(n, l, p);
                                                     }
-                                                    else{
-                                                         return Formatter.fnFormatType(n, l,p);
-                                                    }
-                                                   
                                                 }
-                                            }, 
-                                            editable:true,
+                                            },
+                                            editable: true,
                                             liveChange: function (e) {
                                                 Formatter._fnValidateNumber(e);
                                                 this._fnCheckQty(e);
@@ -659,35 +713,36 @@ sap.ui.define([
                                                 this._fnCheckQty(e);
                                             }.bind(this),
                                             maxLength: 20,
-                                             inputColorMode: {
-                                                 normal: "#f7f7f7",
-                                                 edit: "#ffffff",
-                                                 fixed: "#e8eff6",
-                                                 assembly: "#F9EFDB",
-                                                 noneEdit: "#a9b4be"
-                                             }
+                                            inputColorMode: {
+                                                normal: "#f7f7f7",
+                                                edit: "#ffffff",
+                                                fixed: "#e8eff6",
+                                                assembly: "#F9EFDB",
+                                                noneEdit: "#a9b4be"
+                                            }
                                         }
                                     )
                                 });
                             }
                     }
-                    //s.addData("p13nKey",_aFixedColumn[t].HeaderName);
-                     s.data("p13nKey",_aFixedColumn[t].HeaderName) ;
+                    // s.addData("p13nKey",_aFixedColumn[t].HeaderName);
+                    s.data("p13nKey", _aFixedColumn[t].HeaderName);
                     this._oUIDynamicTable.addColumn(s)
                 }
             }
             this._oUIDynamicTable.setFixedColumnCount(1);
         },
-        onRowsUpdated: function(oEvent){
-             // Your logic to execute after rows are rendered/updated
+        onRowsUpdated: function (oEvent) {
+            // Your logic to execute after rows are rendered/updated
             // You can access the table instance using oEvent.getSource()
             const oTable = oEvent.getSource();
-            const aVisibleRows = oTable.getRows(); // Get the currently visible rows
-            //console.log("Rows updated. Visible rows:", aVisibleRows.length);
+            const aVisibleRows = oTable.getRows();
+            // Get the currently visible rows
+            // console.log("Rows updated. Visible rows:", aVisibleRows.length);
             var oData = this.getModel("subconModel").getProperty("/ItemsSet");
             let _rowAllData = this._oUIDynamicTable.getBinding('rows');
-            var count =  aVisibleRows.length;
-            if(oData.length < count){
+            var count = aVisibleRows.length;
+            if (oData.length<count){
                 count = oData.length;
             }
             var rowStart = this._oUIDynamicTable.getFirstVisibleRow();
@@ -726,8 +781,7 @@ sap.ui.define([
                                    //  $(columId_hdr).addClass("noneEdit1");
                                 }                                    
                             }
-                              selectedRow.getCells()[16].setProperty("editable", false);
-                             
+                              selectedRow.getCells()[16].setProperty("editable", false);                           
                         }
                         else {
                             $(columId).removeClass("subHeader");
@@ -736,8 +790,7 @@ sap.ui.define([
                     }
                     else {
                          $(columId).removeClass("subHeader");
-                        selectedRow.getCells()[16].setProperty("editable", _EditDelQty);
-                        
+                        selectedRow.getCells()[16].setProperty("editable", _EditDelQty);                      
                     }
                 }
                 else{
@@ -745,9 +798,8 @@ sap.ui.define([
                       selectedRow.$().addClass("assemblyPrd");
                 }
             } 
-
         },
-        _fnHandleLinkPress:  function(e){
+         _fnHandleLinkPress:  function(e){
            // debugger;
              if (e.getSource().getParent().getRowBindingContext()) {
                 let a = e.getSource().getParent().getRowBindingContext();
@@ -767,12 +819,10 @@ sap.ui.define([
                     _para1 = _para1.replace(/&1/g, _ShippingPoint);
                     _para2 = _para2.replace(/&2/g, oSelTableRow["COMPONENT"]);               
                     let _fullURL =  this._startUpParemeters._navURL  + _oSemanticObj + _para1 + ";" + _para2 ;
-                    sap.m.URLHelper.redirect(_fullURL,true);    
-                 
+                    sap.m.URLHelper.redirect(_fullURL, true);                    
                 }
-
-                }
-        },
+            }
+        }, 
         _fnHandleLinkSupplierPress:  function(e){
            // debugger;
              if (e.getSource().getParent().getRowBindingContext()) {
@@ -789,13 +839,11 @@ sap.ui.define([
                     let _para1 = "BusinessPartner=&1"
                     _para1 = _para1.replace(/&1/g, _BusinessPartner);               
                     let _fullURL =  this._startUpParemeters._navURL  + _oSemanticObj + _para1  ;
-                    sap.m.URLHelper.redirect(_fullURL,true);    
-                 
+                    sap.m.URLHelper.redirect(_fullURL, true);                    
                 }
-
-                }
+            }
         },
-        _fnCheckQty: function (e) {
+         _fnCheckQty: function (e) {
             //debugger;
             if (e.getParameter("value")) {
                 if (e.getParameter("value").length > 0) {
@@ -836,7 +884,6 @@ sap.ui.define([
                         if (c.length < 1) {
                             c.push(b);
                         }
-
                         this.getModel("subconModel").setProperty("/itemsChangedError", c);
                     }
                     else {
@@ -864,7 +911,7 @@ sap.ui.define([
                     }
                 }
             }
-        },
+        }, 
         fnReGenerateOdataSet: function (headerData, itemsData, headerSubData, itemsSubData) {
             let arrFieldsSet = [];
             var subMappingHdr = [];
@@ -932,7 +979,13 @@ sap.ui.define([
                                 data[j] = itemsData[a][j];
                                 data_2[j] = j;
                                 subMappingHdr[c] = j;
-                                break;                  
+                                break;   
+                           /*  case 25:
+                                j = "RequirementDate";
+                                data[j] = itemsData[a][j];
+                                data_2[j] = j;
+                                subMappingHdr[c] = j;
+                                break;    */                        
                         }
                     }
                 });
@@ -977,7 +1030,11 @@ sap.ui.define([
                                  case 24:
                                     g = "EditDelQty";
                                     data_3[subMappingHdr[c]] = itemsSubData[s][g];
-                                    break;            
+                                    break;    
+                                /*  case 25:
+                                    g = "RequirementDate";
+                                    data_3[subMappingHdr[c]] = itemsSubData[s][g];
+                                    break;    */          
                             }
                             y = true;
                         }
@@ -988,8 +1045,7 @@ sap.ui.define([
                 }
             }
             return arrFieldsSet;
-        },
-
+        }, 
         onRowSelectionChange: function (oEvent) {
             if (oEvent.getSource().getSelectedIndices().length >= 1) {
                 this.getModel("subconModel").setProperty("/createEnable", true);
@@ -999,32 +1055,33 @@ sap.ui.define([
                 for (let sIndex in aTableContext) {
                     sIndex = parseInt(sIndex);
                     aItemsSelected.forEach(_aIndex => {
-                        if (sIndex == _aIndex) {
-                            if (aTableContext[sIndex].getObject()['IsMain'] == true) {
-                                //this._oUIDynamicTable.setSelectionInterval(sIndex, sIndex)
-                                //set selection for all of child row.
-                                 // sub-item data
-      /*                          for(let i = sIndex + 1; i < aTableContext.length; i++ ){
+                if (sIndex == _aIndex) {
+                    if (aTableContext[sIndex].getObject()['IsMain'] == true) {
+                        // this._oUIDynamicTable.setSelectionInterval(sIndex, sIndex)
+                        // set selection for all of child row.
+                        // sub-item data
+                        /*                          for(let i = sIndex + 1; i < aTableContext.length; i++ ){
                                 let b = aTableContext[i].getObject();
                                 if(b['ParentId'] == aTableContext[sIndex].getObject()['RootId'] && b['IsMain'] == false){
                                     this._oUIDynamicTable.setSelectedIndex(i)
                                 }
                                } */
-                            }
-                        }
-                    })
+                    }
                 }
-            }
-            else {
-                this.getModel("subconModel").setProperty("/createEnable", false);
-                this.getModel("subconModel").setProperty("/bDisplayEnable", false);
-            }
-        },
-        onCrtDlvr: function (oEvent) {
+            }) 
+
+            
+
+        }
+        } else {
+            this.getModel("subconModel").setProperty("/createEnable", false);
+            this.getModel("subconModel").setProperty("/bDisplayEnable", false);
+        }},
+        onCrtDlvr : function (oEvent) {
             var _payload_deep_rt = this.fnBuildDeepentity();
             var aItems = this._oUIDynamicTable.getSelectedIndices();
             var aTblItemSet = this.getModel("subconModel").getProperty("/ItemsSet");
-            //debugger;
+            // debugger;
             var k = this.getModel("subconModel").getProperty("/itemsChangedError");
             let flagCheck = false;
             let _message = "";
@@ -1032,7 +1089,6 @@ sap.ui.define([
             if (k.length > 0) {
                 flagCheck = false;
                 for (let a = 0; a < k.length; a++) {
-                    
                     if (k[a]["isErrDelQty"] == true) {
                         flagCheck = true;
                         _message = this.getResourceBundle().getText("dialog.error.validation.itemDelQty");
@@ -1043,44 +1099,39 @@ sap.ui.define([
                         let _total = _stock + _sum_hu;
                         _message = _message.replace(/&1/g, material);
                         _message = _message.replace(/&2/g, batch);
-                         _message = _message.replace(/&3/g, _total);
-                         _aMessage.push(_message);
-                       // break;
+                        _message = _message.replace(/&3/g, _total);
+                        _aMessage.push(_message);
+                        // break;
                     }
                 };
                 if (flagCheck == true) {
-                    _message = this.getResourceBundle().getText("dialog.error.validation.input.itemDelQty"); 
-                    this.showMultileLineWarningMessageBox(_message,_aMessage,"E");
-                   // this._fnHandleErrorExe(_message);
+                    _message = this.getResourceBundle().getText("dialog.error.validation.input.itemDelQty");
+                    this.showMultileLineWarningMessageBox(_message, _aMessage, "E");
+                    // this._fnHandleErrorExe(_message);
                     return;
                 }
             }
             var deepDynamicTable = this.getModel("subconModel").getProperty("/deepDynamicTable");
-
             let i = 0;
             let _CheckQty = false;
-             _aMessage = [];
+            _aMessage = [];
             for (let k = 0; k < aItems.length; k++) {
                 var data1 = {};
-                //main item data
+                // main item data
                 var rowData = aTblItemSet[aItems[k]];
-                if( rowData.IsMain === true){
-                     deepDynamicTable.Header.forEach(ocolumn => {
+                if (rowData.IsMain === true) {
+                    deepDynamicTable.Header.forEach(ocolumn => {
                         i = i + 1;
                         var c = "Col" + ocolumn.HeaderIndex;
-                    
-                        if (parseInt(ocolumn.HeaderIndex) >= 18){
-                        data1[ocolumn.HeaderName] =  aTblItemSet[aItems[k]][ocolumn.HeaderName];
-                        }
-                        else{
+                        if (parseInt(ocolumn.HeaderIndex) >= 18) {
+                            data1[ocolumn.HeaderName] = aTblItemSet[aItems[k]][ocolumn.HeaderName];
+                        } else {
                             data1[c] = aTblItemSet[aItems[k]][ocolumn.HeaderName];
                         }
-                        
                     });
-                    //Add MainIndex,HeaderIndex,ItemIndex.
+                    // Add MainIndex,HeaderIndex,ItemIndex.
                     _payload_deep_rt._ItemsNav.push(data1);
-                }             
-
+                }
                 // sub-item data
                 aTblItemSet.forEach(_rowData => {
                     let data1 = {};
@@ -1088,110 +1139,97 @@ sap.ui.define([
                     if (_rowData.ParentId == rowData.RootId && _rowData.IsMain === false && rowData.IsMain === true && rowData.RootId != 99) {
                         deepDynamicTable.Header.forEach(ocolumn => {
                             i = i + 1;
-                            var c = "Col" + ocolumn.HeaderIndex;                      
-                            if (parseInt(ocolumn.HeaderIndex) >=18)
-                            {
-                                data1[ocolumn.HeaderName] = _rowData[ocolumn.HeaderName];                            
+                            var c = "Col" + ocolumn.HeaderIndex;
+                            if (parseInt(ocolumn.HeaderIndex) >= 18) {
+                                data1[ocolumn.HeaderName] = _rowData[ocolumn.HeaderName];
+                            } else {
+                                if (ocolumn.HeaderName == "SHIP_TO") {
+                                    if (parseFloat(_rowData[ocolumn.HeaderName]) >= 1 && _rowData["EditDelQty"] == true && _rowData["PO_NO"] == "") {
+                                        _CheckQty = true;
+                                    }
+                                }
+                                data1[c] = _rowData[ocolumn.HeaderName];
                             }
-                            else{
-                                 if(ocolumn.HeaderName == "SHIP_TO"){                               
-                                   if(parseFloat(_rowData[ocolumn.HeaderName])>=1 && _rowData["EditDelQty"] == true && _rowData["PO_NO"] ==""){
-                                     _CheckQty = true;
-                                   }
-                                }                                
-                                data1[c] = _rowData[ocolumn.HeaderName];                            
-                            }                          
                         });
-                        if(_CheckQty == true){
-                             _payload_deep_rt._ItemsNav.push(data1);    
-                            }
-                                          
+                        if (_CheckQty == true) {
+                            _payload_deep_rt._ItemsNav.push(data1);
+                        }
                     }
                 })
             }
-            if(_payload_deep_rt._ItemsNav.length < 2){
-               _payload_deep_rt._ItemsNav = []; 
-                _message = this.getResourceBundle().getText("dialog.error.validation.input.itemDelQty"); 
-               this._fnHandleErrorExe(_message);
-               return;
-
+            if (_payload_deep_rt._ItemsNav.length < 2) {
+                _payload_deep_rt._ItemsNav = [];
+                _message = this.getResourceBundle().getText("dialog.error.validation.input.itemDelQty");
+                this._fnHandleErrorExe(_message);
+                return;
             }
             _payload_deep_rt._HeaderNav = deepDynamicTable.Header;
             _payload_deep_rt.RunMode = "C";
-            if (_payload_deep_rt._ItemsNav.length > 0 ) {
+            if (_payload_deep_rt._ItemsNav.length > 0) {
                 this.setBusy(true);
                 this.getService().postProcessCreateDeepEntity(_payload_deep_rt).then(function (aData) { // debugger;
                     this.setBusy(false);
-                    //update data and status
-                    //Display message
+                    // update data and status
+                    // Display message
                     let _aMessage = aData._Message;
                     let _messageType = _aMessage[0].MsgType;
                     let _message = "";
-                    if(_messageType=="S")
-                    {
-                     _message = this.getResourceBundle().getText("dialog.success.create.delivery.complete");
+                    if (_messageType == "S") {
+                        _message = this.getResourceBundle().getText("dialog.success.create.delivery.complete");
+                    } else {
+                        _message = this.getResourceBundle().getText("dialog.error.create.delivery.complete");
                     }
-                    else{
-                         _message = this.getResourceBundle().getText("dialog.error.create.delivery.complete");
-                    }
-                    this.showMultileLineSuccessMessageBox(_message,_aMessage,_messageType);
-                    //process to update back mainscreen
-                   let _aODataDeepTable = this._fnBuildDeepDynamicTable(aData);
-                   if(_aODataDeepTable.Items.length > 0 && _messageType=="S"){
-                        var _dataMainItemSet = this._fnGenerateDataSet(_aODataDeepTable); 
+                    this.showMultileLineSuccessMessageBox(_message, _aMessage, _messageType);
+                    // process to update back mainscreen
+                    let _aODataDeepTable = this._fnBuildDeepDynamicTable(aData);
+                    if (_aODataDeepTable.Items.length > 0 && _messageType == "S") {
+                        var _dataMainItemSet = this._fnGenerateDataSet(_aODataDeepTable);
                         let i = 0;
                         for (let k = 0; k < _dataMainItemSet.length; k++) {
                             var rowMainData = {};
-                            //main item data
+                            // main item data
                             var rowDataNew = _dataMainItemSet[k];
-                            for(let y =0; y< aTblItemSet.length; y++){
-                                if(rowDataNew["IsMain"]==true && rowDataNew["RootId"] == aTblItemSet[y]["RootId"] ){
-                                   // rowMainData = aTblItemSet[y];
-                                    //Process update data for main item
-                                        aTblItemSet[y]["TRAFF_LGT"] = rowDataNew["TRAFF_LGT"];
-                                        aTblItemSet[y]["STOCK"] = rowDataNew["STOCK"];
-                                        aTblItemSet[y]["SUM_HU"] = rowDataNew["SUM_HU"];
-                                        aTblItemSet[y]["STOCK_SUPP"] = rowDataNew["STOCK_SUPP"];
-                                        aTblItemSet[y]["DEMAND"] = rowDataNew["DEMAND"];
-                                        aTblItemSet[y]["SHIP_TO"] = rowDataNew["SHIP_TO"];
-                                        
+                            for (let y = 0; y < aTblItemSet.length; y++) {
+                                if (rowDataNew["IsMain"] == true && rowDataNew["RootId"] == aTblItemSet[y]["RootId"]) {
+                                    // rowMainData = aTblItemSet[y];
+                                    // Process update data for main item
+                                    aTblItemSet[y]["TRAFF_LGT"] = rowDataNew["TRAFF_LGT"];
+                                    aTblItemSet[y]["STOCK"] = rowDataNew["STOCK"];
+                                    aTblItemSet[y]["SUM_HU"] = rowDataNew["SUM_HU"];
+                                    aTblItemSet[y]["STOCK_SUPP"] = rowDataNew["STOCK_SUPP"];
+                                    aTblItemSet[y]["DEMAND"] = rowDataNew["DEMAND"];
+                                    aTblItemSet[y]["SHIP_TO"] = rowDataNew["SHIP_TO"];
                                     break;
                                 }
                             }
                             // sub-item data
-                            aTblItemSet.forEach((_rowData,oIndex) => {
-                                //let data1 = {};
-                                if (_rowData.ParentId == rowDataNew.ParentId && rowDataNew.RootId != 99 && rowDataNew["IsMain"]==false
-                                    && _rowData.MainIndex == rowDataNew.MainIndex  && _rowData.HeaderIndex == rowDataNew.HeaderIndex
-                                    && _rowData.ItemsIndex == rowDataNew.ItemsIndex && _rowData["IsMain"]==false
-                                ) {
-                                    // process update for sub-item
-                                            aTblItemSet[oIndex]["TRAFF_LGT"] = rowDataNew["TRAFF_LGT"];
-                                            aTblItemSet[oIndex]["STOCK"] = rowDataNew["STOCK"];
-                                            aTblItemSet[oIndex]["SUM_HU"] = rowDataNew["SUM_HU"];
-                                            aTblItemSet[oIndex]["STOCK_SUPP"] = rowDataNew["STOCK_SUPP"];
-                                            aTblItemSet[oIndex]["DEMAND"] = rowDataNew["DEMAND"];
-                                            aTblItemSet[oIndex]["SHIP_TO"] = rowDataNew["SHIP_TO"];
-                                            aTblItemSet[oIndex]["PO_NO"]   = rowDataNew["PO_NO"];
+                            aTblItemSet.forEach((_rowData, oIndex) => { // let data1 = {};
+                                if (_rowData.ParentId == rowDataNew.ParentId && rowDataNew.RootId != 99 && rowDataNew["IsMain"] == false && _rowData.MainIndex == rowDataNew.MainIndex && _rowData.HeaderIndex == rowDataNew.HeaderIndex && _rowData.ItemsIndex == rowDataNew.ItemsIndex && _rowData["IsMain"] == false) { // process update for sub-item
+                                    aTblItemSet[oIndex]["TRAFF_LGT"] = rowDataNew["TRAFF_LGT"];
+                                    aTblItemSet[oIndex]["STOCK"] = rowDataNew["STOCK"];
+                                    aTblItemSet[oIndex]["SUM_HU"] = rowDataNew["SUM_HU"];
+                                    aTblItemSet[oIndex]["STOCK_SUPP"] = rowDataNew["STOCK_SUPP"];
+                                    aTblItemSet[oIndex]["DEMAND"] = rowDataNew["DEMAND"];
+                                    aTblItemSet[oIndex]["SHIP_TO"] = rowDataNew["SHIP_TO"];
+                                    aTblItemSet[oIndex]["PO_NO"] = rowDataNew["PO_NO"];
+                                    aTblItemSet[oIndex]["EditDelQty"] = rowDataNew["EditDelQty"];
                                 }
                             })
                         }
-                        //binding new data to table
-                        this.getModel("subconModel").setProperty("/ItemsSet",aTblItemSet);
+                        // binding new data to table
+                        this.getModel("subconModel").setProperty("/ItemsSet", aTblItemSet);
                         this._oUIDynamicTable.getModel("subconModel").refresh(true)
-                   }                 
+                    }
                 }.bind(this), function (oError) {
                     this.setBusy(false);
                     this._fnHandleErrorExe();
 
                 }.bind(this));
             } else {
-               this._fnHandleErrorExe(this.getResourceBundle().getText("dialog.infor.nodata.selected"));
+                this._fnHandleErrorExe(this.getResourceBundle().getText("dialog.infor.nodata.selected"));
             }
         },
-       
-        fnBuildDeepentity: function () {
-            // Call expand query for dynamic table.
+        fnBuildDeepentity : function () { // Call expand query for dynamic table.
             var _payload_deep_rt = {
                 MainId: 1,
                 Title: "",
@@ -1210,7 +1248,7 @@ sap.ui.define([
                 _StorBiNav: [],
                 _AssePrNav: [],
                 _CompoNav: [],
-                _Message:[]
+                _Message: []
             };
             var _filterCondData = this.getOwnerComponent().getModel("filterCondData").getData();
             _payload_deep_rt.Plant = _filterCondData.Plant;
@@ -1226,69 +1264,62 @@ sap.ui.define([
             _payload_deep_rt.Top = this._isSizeLimit;
             return _payload_deep_rt;
         },
-        onStockOvr:  function(oEvent){
-              var aItemsSelected = this._oUIDynamicTable.getSelectedIndices();
-              let aTableContext = this._oUIDynamicTable.getBinding('rows').getAllCurrentContexts();
-              aItemsSelected =  aItemsSelected[0];
-              var _filterCondData = this.getOwnerComponent().getModel("filterCondData").getData();
-              let _Plant = _filterCondData.Plant;
-              let oSelTableRow = aTableContext[aItemsSelected].getObject();
-              let _oSemanticObj = "#Material-displayStockOverviewInWebGUI?sap-ui-tech-hint=GUI&";
-              let _para1 = "Material=&1"
-              let _para2 = "Plant=&2"
-              let _execCommand = ";DYNP_OKCODE=ONLI";
-             _para1 = _para1.replace(/&1/g, oSelTableRow["COMPONENT"]);
-             _para2 = _para2.replace(/&2/g, _Plant);
-              let _fullURL =  this._startUpParemeters._navURL + _oSemanticObj + _para1 + ";" + _para2 + _execCommand;
-              let _intExt = true;
-              sap.m.URLHelper.redirect(_fullURL,_intExt);   
-           
+        onStockOvr : function (oEvent) {
+            var aItemsSelected = this._oUIDynamicTable.getSelectedIndices();
+            let aTableContext = this._oUIDynamicTable.getBinding('rows').getAllCurrentContexts();
+            aItemsSelected = aItemsSelected[0];
+            var _filterCondData = this.getOwnerComponent().getModel("filterCondData").getData();
+            let _Plant = _filterCondData.Plant;
+            let oSelTableRow = aTableContext[aItemsSelected].getObject();
+            let _oSemanticObj = "#Material-displayStockOverviewInWebGUI?sap-ui-tech-hint=GUI&";
+            let _para1 = "Material=&1"
+            let _para2 = "Plant=&2"
+            let _execCommand = ";DYNP_OKCODE=ONLI";
+            _para1 = _para1.replace(/&1/g, oSelTableRow["COMPONENT"]);
+            _para2 = _para2.replace(/&2/g, _Plant);
+            let _fullURL = this._startUpParemeters._navURL + _oSemanticObj + _para1 + ";" + _para2 + _execCommand;
+            let _intExt = true;
+            sap.m.URLHelper.redirect(_fullURL, _intExt);
         },
-        onStockOrRqmts:  function(oEvent){
-           var aItemsSelected = this._oUIDynamicTable.getSelectedIndices();
-              let aTableContext = this._oUIDynamicTable.getBinding('rows').getAllCurrentContexts();
-              aItemsSelected =  aItemsSelected[0];
-              var _filterCondData = this.getOwnerComponent().getModel("filterCondData").getData();
-              let _Plant = _filterCondData.Plant;
-              let oSelTableRow = aTableContext[aItemsSelected].getObject();
-              let _oSemanticObj = "#MRPMaterial-monitorSupplyAndDemand?sap-ui-tech-hint=GUI&";
-               let _para1 = "Material=&1"
-              let _para2 = "MRPPlant=&2"
-              let _para3 = "MRPArea=&3"
-             // let _execCommand = ";DYNP_OKCODE=ENTR";
-             _para1 = _para1.replace(/&1/g, oSelTableRow["COMPONENT"]);
-             _para2 = _para2.replace(/&2/g, _Plant);
-             _para3 = _para3.replace(/&3/g, _Plant);
-              let _fullURL =  this._startUpParemeters._navURL + _oSemanticObj + _para1 + ";" + _para2 +  ";" + _para3 ;
-              let _intExt = true;
-              // debugger
-              sap.m.URLHelper.redirect(_fullURL,_intExt);    
-            },
+        onStockOrRqmts : function (oEvent) {
+            var aItemsSelected = this._oUIDynamicTable.getSelectedIndices();
+            let aTableContext = this._oUIDynamicTable.getBinding('rows').getAllCurrentContexts();
+            aItemsSelected = aItemsSelected[0];
+            var _filterCondData = this.getOwnerComponent().getModel("filterCondData").getData();
+            let _Plant = _filterCondData.Plant;
+            let oSelTableRow = aTableContext[aItemsSelected].getObject();
+            let _oSemanticObj = "#MRPMaterial-monitorSupplyAndDemand?sap-ui-tech-hint=GUI&";
+            let _para1 = "Material=&1"
+            let _para2 = "MRPPlant=&2"
+            let _para3 = "MRPArea=&3"
+            // let _execCommand = ";DYNP_OKCODE=ENTR";
+            _para1 = _para1.replace(/&1/g, oSelTableRow["COMPONENT"]);
+            _para2 = _para2.replace(/&2/g, _Plant);
+            _para3 = _para3.replace(/&3/g, _Plant);
+            let _fullURL = this._startUpParemeters._navURL + _oSemanticObj + _para1 + ";" + _para2 + ";" + _para3;
+            let _intExt = true;
+            // debugger
+            sap.m.URLHelper.redirect(_fullURL, _intExt);
+        },
 
-            fnNavigatetoExternalApp: function(sSemanticObject,sAction,oNavigationParams){
-                 var oCrossAppNavigator = sap.ushell.Container.getService("CrossApplicationNavigation");
-                  // Generate the URL hash for the target app
-                var sHash = (oCrossAppNavigator && oCrossAppNavigator.hrefForExternal({
-                    target: {
-                        semanticObject: sSemanticObject,
-                        action: sAction
-                    },
-                    params: oNavigationParams
-                })) || "";
-
-                // Check if hash was generated successfully
-                    if (sHash) {
-                        // Construct the full URL
-                        var sBaseUrl = window.location.href.split('#')[0];
-                        var sFullUrl = sBaseUrl + sHash;
-
-                        // Open in a new tab (second parameter set to true)
-                        sap.m.URLHelper.redirect(sFullUrl, true);
-                    } else {
-                        // Handle error or inform user
-                        sap.m.MessageToast.show("Navigation service is not available.");
-                    }
+        fnNavigatetoExternalApp : function (sSemanticObject, sAction, oNavigationParams) {
+            var oCrossAppNavigator = sap.ushell.Container.getService("CrossApplicationNavigation");
+            // Generate the URL hash for the target app
+            var sHash = (oCrossAppNavigator && oCrossAppNavigator.hrefForExternal({
+                target: {
+                    semanticObject: sSemanticObject,
+                    action: sAction
+                },
+                params: oNavigationParams
+            })) || "";
+            // Check if hash was generated successfully
+            if (sHash) { // Construct the full URL
+                var sBaseUrl = window.location.href.split('#')[0];
+                var sFullUrl = sBaseUrl + sHash;
+                // Open in a new tab (second parameter set to true)
+                sap.m.URLHelper.redirect(sFullUrl, true);
+            } else { // Handle error or inform user
+                sap.m.MessageToast.show("Navigation service is not available.");
             }
-        });
+    }});
 });
-
