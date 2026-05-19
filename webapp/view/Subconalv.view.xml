@@ -43,10 +43,9 @@
 						showNoData="true"
 						columnResize="onColumnResize" columnMove="onColumnMove" 
 						rowMode="Auto" 
-						sap.ui.fl:flexibility="sap/m/flexibility/EngineFlex" 
 						>	
 				<extension>
-                <m:OverflowToolbar id="_IDGenOverflowToolbar1" visible="false">
+                <m:OverflowToolbar id="_IDGenOverflowToolbar1" visible="true">
                     <m:Title id="title" text=""/>
                     <m:ToolbarSeparator id="_IDGenToolbarSeparator"/>
                     <vm:VariantManagement id="p13nVm" for="tblsubcon"/>
