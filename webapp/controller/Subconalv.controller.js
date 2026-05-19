@@ -4,14 +4,9 @@ sap.ui.define([
     'sap/ui/core/library',
     '../util/Formatter',
     "../custom/Input",
-    "sap/ui/core/routing/History",
-    "sap/ui/table/rowmodes/Fixed",
-    'sap/m/p13n/Engine',
-    'sap/m/p13n/SelectionController',
-    'sap/m/p13n/MetadataHelper',
-    'sap/m/table/ColumnWidthController',
-    "com/bosch/rb1m/sd/sd_subcontr/model/models"
-], function (JSONModel, Base, coreLibrary, Formatter, Input, History, FixedRowMode, Engine, SelectionController, MetadataHelper, ColumnWidthController, models) {
+    "com/bosch/rb1m/sd/sd_subcontr/model/models",
+    "com/bosch/rb1m/sd/sd_subcontr/util/TablePersoHelper"
+], function (JSONModel, Base, coreLibrary, Formatter, Input,  models, TablePersoHelper) {
     "use strict";
     var ValueState = coreLibrary.ValueState;
     return Base.extend("com.bosch.rb1m.sd.sd_subcontr.controller.Subconalv", {
@@ -66,7 +61,7 @@ sap.ui.define([
             }
         },
         navBack: function () {
-            debugger;
+          //  debugger;
         },
         onNavBack: function () {
             var oHistory = sap.ui.core.routing.History.getInstance();
@@ -108,10 +103,28 @@ sap.ui.define([
                 this.fnCreateMockData();
             }.bind(this), function (oError) {
                 this.setBusy(false);
-                this._fnHandleErrorExe();
+                this._fnHandleErrorExe(oError.error.message);
             }.bind(this));
-
         },
+        _extractError: function(oError) {
+			let sMessage = "An unexpected error occurred.";
+			
+			// Check if it's an OData V4 Error Object
+			if (oError && oError.message) {
+				sMessage = oError.message;
+			}
+			
+			// Check for nested response bodies (common in 401/403/500)
+			if (oError.response && oError.response.body) {
+				try {
+					let oBody = JSON.parse(oError.response.body);
+					sMessage = oBody.error.message.value || oBody.error.message;
+				} catch (e) {
+					sMessage = oError.response.body; // Fallback to raw string
+				}
+			}
+			return sMessage;
+		},
         fnCreateMockData: function () {
             this.getModel("subconModel").setProperty("/bDisplayEnable", true);
             var deepDynamicTable = models.fnCreateMockData();
@@ -151,7 +164,6 @@ sap.ui.define([
             }
             return deepDynamicTable;
         },
-
         fnBuildDynamicTableData: function (oData) {
             if (oData.Header.length === 0) {
                 this.getModel("subconModel").setProperty("/ItemsSet", []);
@@ -181,166 +193,55 @@ sap.ui.define([
                 this._oUIDynamicTable.setRowMode(sap.ui.table.rowmodes.Type.Auto);
             }
             this._fnBuildTable(oTable);
-            // init persionlizationengine
-            // this._registerForP13n();
+             if(this.getModel("subconModel").getProperty("/ItemsSet").length > 0){
+                this.initPersonalization();
+            }
 
         },
-        _registerForP13n: function () {
-            const oTable = this.byId("tblsubcon");
-            this.oMetadataHelper = new MetadataHelper([
-                {
-                    key: 'TRAFF_LGT',
-                    label: 'Traffic Light',
-                    path: 'Traffic Light'
-                },
-                {
-                    key: 'SUPP_NO',
-                    label: 'Supplier Number',
-                    path: 'Supplier Number'
-                },
-                {
-                    key: 'SUPP_NAME',
-                    label: 'Supplier Name',
-                    path: 'Supplier Name'
-                },
-                {
-                    key: 'SUPP_CITY',
-                    label: 'Supplier City',
-                    path: 'Supplier City'
-                }, {
-                    key: 'SUPP_CTRY',
-                    label: 'Supplier Country',
-                    path: 'Supplier Country'
-                }, {
-                    key: 'PO_NO',
-                    label: 'Purchase Document',
-                    path: 'Purchase Document'
-                }, {
-                    key: 'ASSE_PRD',
-                    label: 'Assembly Product',
-                    path: 'Assembly Product'
-                }, {
-                    key: 'PRD_DESCR',
-                    label: 'Product Description',
-                    path: 'Product Description'
-                }, {
-                    key: 'COMPONENT',
-                    label: 'Component',
-                    path: 'Component'
-                }, {
-                    key: 'COMP_DESCR',
-                    label: 'Component Description',
-                    path: 'Component Description'
-                }, {
-                    key: 'STOCK',
-                    label: 'Stock',
-                    path: 'Stock'
-                }, {
-                    key: 'UOM',
-                    label: 'Unit Of Measure',
-                    path: 'Unit Of Measure'
-                }, {
-                    key: 'SUM_HU',
-                    label: 'Sum. HU',
-                    path: 'Sum. HU'
-                }, {
-                    key: 'STOCK_SUPP',
-                    label: 'Stock At Supplier',
-                    path: 'Stock At Supplier'
-                }, {
-                    key: 'BEN',
-                    label: '',
-                    path: ''
-                }, {
-                    key: 'DEMAND',
-                    label: 'Demand',
-                    path: 'Demand'
-                }, {
-                    key: 'SHIP_TO',
-                    label: 'Ship To Party',
-                    path: 'Ship To Party'
-                }, {
-                    key: 'IsMain',
-                    label: 'Is Main',
-                    path: 'Is Main'
-                }, {
-                    key: 'RootId',
-                    label: 'Root ID',
-                    path: 'Root ID'
-                }, {
-                    key: 'ParentId',
-                    label: 'Parent ID',
-                    path: 'Parent ID'
-                }, {
-                    key: 'MainIndex',
-                    label: 'Main Index',
-                    path: 'Main Index'
-                }, {
-                    key: 'HeaderIndex',
-                    label: 'Header Index',
-                    path: 'Header Index'
-                }, {
-                    key: 'ItemsIndex',
-                    label: 'Items Index',
-                    path: 'Items Index'
-                }, {
-                    key: 'EditDelQty',
-                    label: 'Edit Del.Qty',
-                    path: 'Edit Del.Qty'
-                }
+        initPersonalization: function () {
+          // 🌟 STEP 2.A: CUSTOM INLINE CONFIGURATION FOR TABLE 1 (Main Subcon Table)
+            var aSubconTableConfig = [
+                { key: 'TRAFF_LGT', label: 'Traffic Light' },
+                { key: 'SUPP_NO', label: 'Supplier Number' },
+                { key: 'SUPP_NAME', label: 'Supplier Name' },
+                { key: 'SUPP_CITY', label: 'Supplier City' },
+                { key: 'SUPP_CTRY', label: 'Supplier Country' },
+                { key: 'PO_NO', label: 'Purchase Document' },
+                { key: 'ASSE_PRD', label: 'Assembly Product' },
+                { key: 'PRD_DESCR', label: 'Product Description' },
+                { key: 'COMPONENT', label: 'Component' },
+                { key: 'COMP_DESCR', label: 'Component Description' },
+                { key: 'STOCK', label: 'Stock' },
+                { key: 'UOM', label: 'Unit Of Measure' },
+                { key: 'SUM_HU', label: 'Sum. HU' },
+                { key: 'STOCK_SUPP', label: 'Stock At Supplier' },
+                { key: 'DEMAND', label: 'Demand' },
+                { key: 'SHIP_TO', label: 'Ship To Party' }
+            ];
 
-            ]);
-            this._mIntialWidth = {
-                "TRAFF_LGT": "3rem",
-                "SUPP_NO": "3.5rem",
-                "SUPP_NAME": "3.5rem",
-                "SUPP_CITY": "3.5rem",
-                "SUPP_CTRY": "3.5rem",
-                "PO_NO": "4rem",
-                "ASSE_PRD": "6rem",
-                "PRD_DESCR": "6rem",
-                "COMPONENT": "6rem",
-                "COMP_DESCR": "6rem",
-                "STOCK": "4rem",
-                "UOM": "4rem",
-                "SUM_HU": "4rem",
-                "STOCK_SUPP": "4rem",
-                "BEN": "3rem",
-                "DEMAND": "4rem",
-                "SHIP_TO": "6rem"
-            };
-            Engine.getInstance().register(oTable, {
-                helper: this.oMetadataHelper,
-                controller: {
-                    Columns: new SelectionController(
-                        {targetAggregation: "columns", control: oTable}
-                    ),
-                    // Sorter: new SortController({
-                    //     control: oTable
-                    // }),
-                    // Groups: new GroupController({
-                    //     control: oTable
-                    // }),
-                    ColumnWidth: new ColumnWidthController(
-                        {control: oTable}
-                    )
-                }
-            });
-
-            Engine.getInstance().attachStateChange(this.handleStateChange, this);
+            // Instantiate Helper for Table 1
+            this._oSubconPersoHelper = new TablePersoHelper(this._oUIDynamicTable, aSubconTableConfig,this.getModel("subconModel"),"Standard");
         },
+         /**
+         * Settings handler for Table 1 (Main Subcon Table)
+         */
         openPersoDialog: function (oEvt) {
+            if (this._oSubconPersoHelper) {
+                this._oSubconPersoHelper.openDialog("column");
+                //this._oSubconPersoHelper.openDialog("column");
+            }
+        },
+      /*   openPersoDialog: function (oEvt) {
             const oTable = this._oUIDynamicTable;
             Engine.getInstance().show(oTable, ["Columns"], {
                 contentHeight: "35rem",
                 contentWidth: "32rem",
                 source: oEvt.getSource()
             });
-        },
+        }, */
         _getKey: function (oControl) {
             return oControl.data("p13nKey");
         },
-
         handleStateChange: function (oEvt) {
             const oTable = oEvt.getParameter("control");
             const oState = oEvt.getParameter("state");
@@ -605,7 +506,6 @@ sap.ui.define([
                                                             }, {
                                                                 path: 'subconModel>RootId'
                                                             }
-
                                                         ],
                                                         formatter: function (n, l, p) {
                                                             this.removeStyleClass("cussapMLnkSubtle");
@@ -1069,9 +969,6 @@ sap.ui.define([
                     }
                 }
             }) 
-
-            
-
         }
         } else {
             this.getModel("subconModel").setProperty("/createEnable", false);
@@ -1186,7 +1083,7 @@ sap.ui.define([
                         var _dataMainItemSet = this._fnGenerateDataSet(_aODataDeepTable);
                         let i = 0;
                         for (let k = 0; k < _dataMainItemSet.length; k++) {
-                            var rowMainData = {};
+                            //var rowMainData = {};
                             // main item data
                             var rowDataNew = _dataMainItemSet[k];
                             for (let y = 0; y < aTblItemSet.length; y++) {
@@ -1218,12 +1115,11 @@ sap.ui.define([
                         }
                         // binding new data to table
                         this.getModel("subconModel").setProperty("/ItemsSet", aTblItemSet);
-                        this._oUIDynamicTable.getModel("subconModel").refresh(true)
+                        this._oUIDynamicTable.getModel("subconModel").refresh(true);
                     }
                 }.bind(this), function (oError) {
                     this.setBusy(false);
-                    this._fnHandleErrorExe();
-
+                    this._fnHandleErrorExe(oError.error.message);
                 }.bind(this));
             } else {
                 this._fnHandleErrorExe(this.getResourceBundle().getText("dialog.infor.nodata.selected"));
@@ -1301,7 +1197,6 @@ sap.ui.define([
             // debugger
             sap.m.URLHelper.redirect(_fullURL, _intExt);
         },
-
         fnNavigatetoExternalApp : function (sSemanticObject, sAction, oNavigationParams) {
             var oCrossAppNavigator = sap.ushell.Container.getService("CrossApplicationNavigation");
             // Generate the URL hash for the target app
