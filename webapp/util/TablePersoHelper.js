@@ -64,10 +64,10 @@ sap.ui.define([
             // Map standard sequential properties arrays into persistent properties fields structures
             const aCols = this._aColumnConfig.map((oItem, iIndex) => ({
                 key: oItem.key,
-                visible: true,
-                order: iIndex,
-                width: "150px", // Baseline standard cell fallback width limit constraint
-                selected: iIndex === 0
+                visible: oItem.visible !== undefined ? oItem.visible : true,
+                order: oItem.order !== undefined ? oItem.order : iIndex,
+                width: oItem.width !== undefined ? oItem.width : "5rem",
+                selected: oItem.selected !== undefined ? oItem.selected : iIndex === 0
             }));
 
             this._stateModel.setProperty("/columns", aCols);
@@ -96,11 +96,309 @@ sap.ui.define([
 
             if (sTabKey && this._oTabBar) {
                 this._oTabBar.setSelectedKey(sTabKey);
+                this._oTabBar.getItems().forEach(item => {
+                    if (item.getKey() === "sortTab" || item.getKey() === "filterTab" || item.getKey() === "groupTab") {
+                        item.setVisible(false);
+                    }
+                });
             }
 
             this._oDialog.open();
         },
+       
+    _columnsTab: function () {
+            return new IconTabFilter({
+                key: "columnTab",
+                text: "Columns",
+                content: [new List({
+                    mode: "SingleSelectMaster",
+                    includeItemInSelection: true, 
+                    items: {
+                        path: "state>/columns",
+                        sorter: new sap.ui.model.Sorter("order", false),
+                        template: new CustomListItem({
+                            highlight: {
+                                path: "state>selected",
+                                formatter: (bSelected) => bSelected ? "Information" : "None"
+                            },
+                            content: new HBox({
+                                alignItems: "Center",
+                                justifyContent: "SpaceBetween",
+                                width: "100%",
+                                items: [
+                                    // LEFT SIDE ZONE
+                                    new HBox({
+                                        alignItems: "Center",
+                                        width: "70%", 
+                                        items: [
+                                            // COLUMN 0: Checkbox with dynamic suffixing
+                                            new CheckBox({
+                                                id: this.createId ? this.createId("perso_cb") : undefined, // Safeguard standard view IDs
+                                                selected: "{state>selected}",
+                                                select: (oEvent) => {
+                                                    const ctx = oEvent.getSource().getBindingContext("state");
+                                                    const obj = ctx.getObject();
+                                                    obj.selected = oEvent.getParameter("selected");
+                                                    obj.visible =  obj.selected;
+                                                    this._stateModel.refresh(true);
+                                                }
+                                            }).setLayoutData(new sap.m.FlexItemData({ baseSize: "40px" })),
 
+                                            // COLUMN 1: The Field Name Value
+                                            new Text({ 
+                                                text: "{state>key}",
+                                                wrapping: false
+                                            }).setLayoutData(new sap.m.FlexItemData({ 
+                                                growFactor: 1,
+                                                baseSize: "60%" 
+                                            })).addStyleClass("sapUiSmallMarginEnd"),
+
+                                            // COLUMN 2: The Width Value (Aligned cleanly)
+                                            new Input({ 
+                                                value: "{state>width}", 
+                                                width: "80px" 
+                                            }).setLayoutData(new sap.m.FlexItemData({
+                                                baseSize: "40%"
+                                            })).addStyleClass("sapUiMediumMarginEnd")
+                                        ]
+                                    }),
+                                    
+                                    // RIGHT SIDE ZONE (Buttons)
+                                    new HBox({
+                                        visible: "{= ${state>selected} === true }",
+                                        alignItems: "Center",
+                                        items: [
+                                            new sap.m.Button({
+                                                icon: "sap-icon://collapse-group",
+                                                tooltip: "Move First",
+                                                enabled: "{= !${ui>/isDragging} }",
+                                                press: (e) => this._moveColumn(this._getIndex(e), "first")
+                                            }),
+                                            new sap.m.Button({
+                                                icon: "sap-icon://slim-arrow-up",
+                                                tooltip: "Move Up",
+                                                enabled: "{= !${ui>/isDragging} }",
+                                                press: (e) => this._moveColumn(this._getIndex(e), "up")
+                                            }),
+                                            new sap.m.Button({
+                                                icon: "sap-icon://slim-arrow-down",
+                                                tooltip: "Move Down",
+                                                enabled: "{= !${ui>/isDragging} }",
+                                                press: (e) => this._moveColumn(this._getIndex(e), "down")
+                                            }),
+                                            new sap.m.Button({
+                                                icon: "sap-icon://expand-group",
+                                                tooltip: "Move Last",
+                                                enabled: "{= !${ui>/isDragging} }",
+                                                press: (e) => this._moveColumn(this._getIndex(e), "last")
+                                            })
+                                        ]
+                                    }).addStyleClass("moveButtons")
+                                ]
+                            })
+                        }).addStyleClass("columnRow") 
+                    },
+                    dragDropConfig: [
+                        new sap.ui.core.dnd.DragInfo({
+                            sourceAggregation: "items"
+                        }),
+                        new sap.ui.core.dnd.DropInfo({
+                            targetAggregation: "items",
+                            dropPosition: "Between",
+                            drop: (oEvent) => {
+                                const dragged = oEvent.getParameter("draggedControl");
+                                const dropped = oEvent.getParameter("droppedControl");
+                                const from = this._getIndexFromItem(dragged);
+                                const to = this._getIndexFromItem(dropped);
+                                this._reorderByDrag(from, to);
+                            }
+                        })
+                    ]
+                }).addStyleClass("columnRow")]
+            });
+        },
+       _groupTab: function () {
+            return new IconTabFilter({
+                key: "groupTab",
+                text: "Group",
+                content: [
+                    new sap.m.OverflowToolbar({
+                      content: [
+                        new sap.m.ToolbarSpacer(),
+                        new Button({
+                            text: "Add Group",
+                            icon: "sap-icon://add",
+                            type: "Emphasized",
+                            press: () => {
+                                const d = this._stateModel.getProperty("/group");
+                                const firstKey = Object.keys(this._meta)[0];
+
+                                d.push({ key: firstKey });
+
+                                this._stateModel.refresh(true);
+                            }
+                        }),
+                    ] })  ,
+                    new List({
+                        items: {
+                            path: "state>/group",
+                            template: new CustomListItem({
+
+                                content: new HBox({
+                                    alignItems: "Center",
+                                    justifyContent: "Start",
+                                    items: [
+
+                                        // 🔽 Group field selector
+                                        new Select({
+                                            selectedKey: "{state>key}",
+                                            width: "200px",
+                                            items: this._getItems()
+                                        }),
+
+                                        // 🗑 DELETE BUTTON
+                                        new sap.m.Button({
+                                            icon: "sap-icon://delete",
+                                            type: "Transparent",
+                                            tooltip: "Remove Group",
+
+                                            press: (oEvent) => {
+                                                const ctx = oEvent.getSource().getBindingContext("state");
+                                                const index = parseInt(ctx.getPath().split("/").pop());
+
+                                                const groupData = this._stateModel.getProperty("/group");
+                                                groupData.splice(index, 1);
+
+                                                this._stateModel.refresh(true);
+                                            }
+                                        }).addStyleClass("sapUiTinyMarginBegin")
+
+                                    ]
+                                })
+
+                            })
+                        }
+                    }) 
+                ]
+                           
+            });
+        },
+         _sortTab: function () {
+                return new IconTabFilter({
+                    key: "sortTab",
+                    text: "Sort",
+                     content: [
+                         new sap.m.OverflowToolbar({
+                            content: [
+                                new sap.m.ToolbarSpacer(),
+                                new Button({
+                                    text: "Add Sort",
+                                    icon: "sap-icon://add",
+                                    type: "Emphasized",
+                                    press: () => {
+                                        const d = this._stateModel.getProperty("/sort");
+                                        const firstKey = Object.keys(this._meta)[0];
+                                        d.push({ key: firstKey, descending: false });
+                                        this._stateModel.refresh(true);
+                                    }
+                                })                           
+                            ]
+                         }),
+                        new List({
+                                    items: {
+                                        path: "state>/sort",
+                                        template: new CustomListItem({
+                                            content: new HBox({
+                                                alignItems: "Center",
+                                                justifyContent: "Start",
+                                                items: [
+                                                    // ✅ PLACE IT HERE (first element)
+                                                    new sap.m.Text({
+                                                        text: "Sort by"
+                                                    }).addStyleClass("sapUiTinyMarginEnd"),
+                                                // 🔽 Column selector
+                                                    new Select({
+                                                        selectedKey: "{state>key}",
+                                                        width: "180px",
+                                                        items: this._getItems()
+                                                    }),
+                                                    // 🔽 SegmentedButton (FIXED)
+                                                    new sap.m.SegmentedButton({
+                                                        width: "120px",
+
+                                                        selectedKey: {
+                                                            path: "state>descending",
+                                                            formatter: function (b) {
+                                                                return b ? "true" : "false";
+                                                            }
+                                                        },
+                                                        items: [
+                                                            new sap.m.SegmentedButtonItem({
+                                                                key: "false",
+                                                                icon: "sap-icon://sort-ascending",
+                                                                tooltip: "Ascending"
+                                                            }),
+                                                            new sap.m.SegmentedButtonItem({
+                                                                key: "true",
+                                                                icon: "sap-icon://sort-descending",
+                                                                tooltip: "Descending"
+                                                            })
+                                                        ],
+                                                        selectionChange: function (oEvent) {
+                                                            const key = oEvent.getParameter("item").getKey();
+                                                            const ctx = oEvent.getSource().getBindingContext("state");
+                                                            ctx.getObject().descending = (key === "true");
+                                                            this._stateModel.refresh(true);
+                                                        }.bind(this)
+                                                    }).addStyleClass("sapUiTinyMarginBegin"),
+                                                    new sap.m.Text({
+                                                            text: {
+                                                                path: "state>descending",
+                                                                formatter: function (b) {
+                                                                    return b ? "Descending" : "Ascending";
+                                                                }
+                                                            }
+                                                        }).addStyleClass("sapUiTinyMarginBegin"),
+                                                        // 🗑 DELETE BUTTON (NEW)
+                                                        new sap.m.Button({
+                                                            icon: "sap-icon://delete",
+                                                            type: "Transparent",
+                                                            tooltip: "Remove Sort",
+                                                            press: (oEvent) => {
+                                                                const ctx = oEvent.getSource().getBindingContext("state");
+                                                                const path = ctx.getPath(); // e.g. /sort/0
+                                                                const index = parseInt(path.split("/").pop());
+                                                                const sortData = this._stateModel.getProperty("/sort");
+                                                                sortData.splice(index, 1);
+                                                                this._stateModel.refresh(true);
+                                                            }
+                                                        }).addStyleClass("sapUiTinyMarginBegin")
+                                                ]
+                                            })
+
+                                        })
+                                    }
+                                })
+                     ]         
+                });
+            },  
+        _getIndex: function (oEvent) {
+            const ctx = oEvent.getSource().getBindingContext("state");
+            const path = ctx.getPath(); // "/columns/3"
+            return parseInt(path.split("/").pop(), 10);
+        },
+        _getIndexFromItem: function (item) {
+            const ctx = item.getBindingContext("state");
+            return parseInt(ctx.getPath().split("/").pop(), 10);
+        },
+
+        _reorderByDrag: function (from, to) {
+            const cols = this._stateModel.getProperty("/columns");
+            const [moved] = cols.splice(from, 1);
+            cols.splice(to, 0, moved);
+            cols.forEach((c, i) => c.order = i);
+            this._stateModel.refresh(true);
+        },
         /**
          * Translates metadata configurations seamlessly into structural dialog tabs configurations
          */
@@ -109,117 +407,18 @@ sap.ui.define([
                 expandable: false,
                 items: [
                     // --- TAB 1: COLUMNS DISPLAY VISIBILITY ---
-                    new IconTabFilter({
-                        key: "column",
-                        text: "Columns",
-                        content: [
-                            new List({
-                                items: {
-                                    path: "state>/columns",
-                                    template: new CustomListItem({
-                                        content: [
-                                            new HBox({
-                                                alignItems: "Center", justifyContent: "SpaceBetween",
-                                                items: [
-                                                    new CheckBox({ 
-                                                        text: { parts: [{ path: "state>key" }], formatter: (k) => this._getLabelByKey(k) }, 
-                                                        selected: "{state>visible}" 
-                                                    }),
-                                                    new HBox({
-                                                        items: [
-                                                            new Button({ icon: "sap-icon://navigation-up-arrow", type: "Transparent", press: (oEvt) => this._onMoveColumnPress(oEvt, "up") }),
-                                                            new Button({ icon: "sap-icon://navigation-down-arrow", type: "Transparent", press: (oEvt) => this._onMoveColumnPress(oEvt, "down") })
-                                                        ]
-                                                    })
-                                                ]
-                                            }).addStyleClass("sapUiTinyMargin")
-                                        ]
-                                    })
-                                }
-                            })
-                        ]
-                    }),
-
+                    this._columnsTab().setKey("columnTab"),               
                     // --- TAB 2: LEVEL SELECT SORT MAPPERS ---
-                    new IconTabFilter({
-                        key: "sort",
-                        text: "Sort",
-                        content: [
-                            new List({
-                                items: {
-                                    path: "state>/columns",
-                                    template: new CustomListItem({
-                                        content: [
-                                            new HBox({
-                                                alignItems: "Center", justifyContent: "SpaceBetween",
-                                                items: [
-                                                    new Label({ text: { parts: [{ path: "state>key" }], formatter: (k) => this._getLabelByKey(k) }, width: "200px" }),
-                                                    new Select({
-                                                        selectedKey: {
-                                                            parts: [{ path: "state>key" }, { path: "state>/sort" }],
-                                                            formatter: (sKey, aSorts) => {
-                                                                const match = (aSorts || []).find(s => s.key === sKey);
-                                                                if (!match) return "None";
-                                                                return match.descending ? "Descending" : "Ascending";
-                                                            }
-                                                        },
-                                                        change: (oEvt) => this._onSortDropdownChange(oEvt),
-                                                        width: "180px",
-                                                        items: [
-                                                            new Item({ key: "None", text: "None" }),
-                                                            new Item({ key: "Ascending", text: "Ascending" }),
-                                                            new Item({ key: "Descending", text: "Descending" })
-                                                        ]
-                                                    })
-                                                ]
-                                            }).addStyleClass("sapUiTinyMargin")
-                                        ]
-                                    })
-                                }
-                            })
-                        ]
-                    }),
-
+                    this._sortTab().setKey("sortTab"),
                     // --- TAB 3: DYNAMIC RULES VALUE-HELP FILTERS ---
-                    this._filterTab(),
-
+                    this._filterTab().setKey("filterTab"),
                     // --- TAB 4: ALV MANUALLY TRIGGERED MULTI-GROUP RULES ---
-                    new IconTabFilter({
-                        key: "group",
-                        text: "Group",
-                        content: [
-                            new List({
-                                items: {
-                                    path: "state>/columns",
-                                    template: new CustomListItem({
-                                        content: [
-                                            new HBox({
-                                                alignItems: "Center", justifyContent: "SpaceBetween",
-                                                items: [
-                                                    new Label({ text: { parts: [{ path: "state>key" }], formatter: (k) => this._getLabelByKey(k) }, width: "200px" }),
-                                                    new Switch({
-                                                        state: {
-                                                            parts: [{ path: "state>key" }, { path: "state>/group" }],
-                                                            formatter: (sKey, aGroups) => {
-                                                                return (aGroups || []).some(g => g.key === sKey);
-                                                            }
-                                                        },
-                                                        change: (oEvt) => this._onGroupSwitchToggle(oEvt),
-                                                        customTextOn: "Yes", customTextOff: "No"
-                                                    })
-                                                ]
-                                            }).addStyleClass("sapUiTinyMargin")
-                                        ]
-                                    })
-                                }
-                            })
-                        ]
-                    })
+                    this._groupTab().setKey("groupTab")
                 ]
             });
 
             return new Dialog({
-                title: "Table Display Personalization Custom Settings",
+                title: "View Settings",
                 contentWidth: "650px", contentHeight: "500px",
                 draggable: true, resizable: true,
                 content: [this._oTabBar],
@@ -246,6 +445,7 @@ sap.ui.define([
             return new IconTabFilter({
                 key: "filterTab",
                 text: "Filters",
+                visible: false, // Set to true if filter tab should be available
                 content: [
                     new sap.m.OverflowToolbar({
                         content: [
@@ -269,7 +469,7 @@ sap.ui.define([
                     }),
 
                     new List({
-                        id: this.getId() + "--filterColumnList",
+                        id:  this.createId ? this.createId("perso_filterColumnList") : undefined,
                         noDataText: "No filters defined. Click 'Add Filter' to begin.",
                         items: {
                             path: "state>/filter",
@@ -409,7 +609,32 @@ sap.ui.define([
             aCols.forEach((c, i) => c.order = i);
             this._stateModel.refresh(true);
         },
-
+       _moveColumn: function (index, direction) {
+            const cols = this._stateModel.getProperty("/columns");
+            if (index < 0 || index >= cols.length) return;
+            let newIndex = index;
+            switch (direction) {
+                case "up":
+                    newIndex = index - 1;
+                    break;
+                case "down":
+                    newIndex = index + 1;
+                    break;
+                case "first":
+                    newIndex = 0;
+                    break;
+                case "last":
+                    newIndex = cols.length - 1;
+                    break;
+            }
+            if (newIndex < 0 || newIndex >= cols.length) return;
+            // ✅ remove and insert
+            const [moved] = cols.splice(index, 1);
+            cols.splice(newIndex, 0, moved);
+            // ✅ reassign order
+            cols.forEach((c, i) => c.order = i);
+            this._stateModel.refresh(true);
+        },
         _onSortDropdownChange: function (oEvent) {
             const sSel = oEvent.getParameter("selectedItem").getKey();
             const sKey = oEvent.getSource().getBindingContext("state").getProperty("key");
@@ -486,7 +711,7 @@ sap.ui.define([
                     const oTargetCol = aExistingColumns.find(col => col.data("p13nKey") === c.key);
                     if (oTargetCol) {
                         oTargetCol.setVisible(true);
-
+                        oTargetCol.setWidth(c.width);
                         // Sync Sort State Visual Markers
                         const oSortInfo = oState.sort.find(s => s.key === c.key);
                         oTargetCol.setSorted(!!oSortInfo);
