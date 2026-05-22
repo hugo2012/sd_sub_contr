@@ -96,8 +96,6 @@ sap.ui.define([
                     this.getModel("subconModel").setProperty("/bDisplayEnable", false);
                     let _sMessage = this.getResourceBundle().getText("dialog.error.nodata.found");
                     this._fnHandleErrorExe(_sMessage);
-                    // this.onNavBack();
-                    // return;
                 }
                 // create mock sample
                 this.fnCreateMockData();
@@ -131,7 +129,6 @@ sap.ui.define([
             this.getModel("subconModel").setProperty("/deepDynamicTable", deepDynamicTable);
             this.fnBuildDynamicTableData(deepDynamicTable);
             this.setBusy(false);
-            // create mock sample data
         },
         _fnBuildDeepDynamicTable: function (aData) {
             var deepDynamicTable = {
@@ -201,22 +198,23 @@ sap.ui.define([
         initPersonalization: function () {
           // 🌟 STEP 2.A: CUSTOM INLINE CONFIGURATION FOR TABLE 1 (Main Subcon Table)
             var aSubconTableConfig = [
-                { key: 'TRAFF_LGT', label: 'Traffic Light' },
-                { key: 'SUPP_NO', label: 'Supplier Number' },
-                { key: 'SUPP_NAME', label: 'Supplier Name' },
-                { key: 'SUPP_CITY', label: 'Supplier City' },
-                { key: 'SUPP_CTRY', label: 'Supplier Country' },
-                { key: 'PO_NO', label: 'Purchase Document' },
-                { key: 'ASSE_PRD', label: 'Assembly Product' },
-                { key: 'PRD_DESCR', label: 'Product Description' },
-                { key: 'COMPONENT', label: 'Component' },
-                { key: 'COMP_DESCR', label: 'Component Description' },
-                { key: 'STOCK', label: 'Stock' },
-                { key: 'UOM', label: 'Unit Of Measure' },
-                { key: 'SUM_HU', label: 'Sum. HU' },
-                { key: 'STOCK_SUPP', label: 'Stock At Supplier' },
-                { key: 'DEMAND', label: 'Demand' },
-                { key: 'SHIP_TO', label: 'Ship To Party' }
+                { key: 'TRAFF_LGT', label: 'Traffic Light',visible: true ,order: 1,width: "3rem",selected: true},
+                { key: 'SUPP_NO', label: 'Supplier Number',visible: true ,order: 2,width: "5rem",selected: true},
+                { key: 'SUPP_NAME', label: 'Supplier Name',visible: true ,order: 3,width: "5rem",selected: true},
+                { key: 'SUPP_CITY', label: 'Supplier City',visible: true ,order: 4,width: "5rem",selected: true},
+                { key: 'SUPP_CTRY', label: 'Supplier Country',visible: true ,order: 5,width: "4rem",selected: true},
+                { key: 'PO_NO', label: 'Purchase Document',visible: true ,order: 6,width: "5rem",selected: true},
+                { key: 'ASSE_PRD', label: 'Assembly Product',visible: true ,order: 7,width: "8rem",selected: true},
+                { key: 'PRD_DESCR', label: 'Product Description',visible: true ,order: 8,width: "8rem",selected: true},
+                { key: 'COMPONENT', label: 'Component',visible: true ,order: 9,width: "8rem",selected: true},
+                { key: 'COMP_DESCR', label: 'Component Description',visible: true ,order: 10,width: "8rem",selected: true},
+                { key: 'STOCK', label: 'Stock',visible: true ,order: 11,width: "5rem",selected: true},
+                { key: 'UOM', label: 'Unit Of Measure',visible: true ,order: 12,width: "4rem",selected: true},
+                { key: 'SUM_HU', label: 'Sum. HU',visible: true ,order: 13,width: "5rem",selected: true},
+                { key: 'STOCK_SUPP', label: 'Stock At Supplier',visible: true ,order: 14,width: "5rem",selected: true},
+                { key: 'BEN', label: '.',visible: true ,order: 14,width: "3rem",selected: true},
+                { key: 'DEMAND', label: 'Demand',visible: true ,order: 15, width: "5rem",selected: true},
+                { key: 'SHIP_TO', label: 'Ship To Party',visible: true ,order: 16,width: "7rem",selected: true}
             ];
 
             // Instantiate Helper for Table 1
@@ -444,6 +442,21 @@ sap.ui.define([
                                 )
                             });
                             break;
+                        case "BEN":
+                            // code block
+                            s = new sap.ui.table.Column({
+                                width: "100%",
+                                visible: true,
+                                headerMenu: "menu",
+                                resizable: true,
+                                label: new sap.m.Label(
+                                    {text: _aFixedColumn[t].HeaderValue, tooltip: _aFixedColumn[t].HeaderValue}
+                                ),
+                                template: new sap.m.Text(
+                                    {text: a}
+                                )
+                            });
+                            break;
                             /*  case "RequirementDate":
                             // code block
                             s = new sap.ui.table.Column({
@@ -466,8 +479,10 @@ sap.ui.define([
                                 _width = "100%";
                             } else {
                                 switch (_aFixedColumn[t].HeaderName) {
-                                    case "COMPONENT": _width = "6rem"
+                                    case "COMPONENT": _width = "100%"
                                         break;
+                                    case "COMP_DESCR": _width = "100%" 
+                                        break
                                     case "STOCK": _width = "4rem"
                                         break;
                                     case "UOM": _width = "4rem"
@@ -604,7 +619,18 @@ sap.ui.define([
                                                     }
                                                 }
                                             },
-                                            editable: true,
+                                            editable: {
+                                                parts: [
+                                                    { path: 'subconModel>EditDelQty' },
+                                                    { path: 'subconModel>RootId' }
+                                                ],
+                                                formatter: function(bEditDelQty, sRootId) {
+                                                    if (sRootId == 99) {
+                                                        return false;
+                                                    }
+                                                    return !!bEditDelQty;
+                                                }
+                                            },
                                             liveChange: function (e) {
                                                 Formatter._fnValidateNumber(e);
                                                 this._fnCheckQty(e);
@@ -632,7 +658,7 @@ sap.ui.define([
             }
             this._oUIDynamicTable.setFixedColumnCount(1);
         },
-        onRowsUpdated: function (oEvent) {
+      /*   onRowsUpdated: function (oEvent) {
             // Your logic to execute after rows are rendered/updated
             // You can access the table instance using oEvent.getSource()
             const oTable = oEvent.getSource();
@@ -698,6 +724,66 @@ sap.ui.define([
                       selectedRow.$().addClass("assemblyPrd");
                 }
             } 
+        }, */
+        onRowsUpdated: function (oEvent) {
+            const oTable = oEvent.getSource();
+            const aVisibleRows = oTable.getRows();
+            var oData = this.getModel("subconModel").getProperty("/ItemsSet");
+            let _rowAllData = oTable.getBinding('rows');
+            
+            if (oData.length < 1) {
+                return;
+            }
+
+            var count = aVisibleRows.length;
+            if (oData.length < count) {
+                count = oData.length;
+            }
+
+            for (var i = 0; i < count; i++) {
+                var selectedRow = aVisibleRows[i];
+                var currentRowContext = selectedRow.getRowBindingContext();               
+                if (!currentRowContext) {
+                    continue;
+                }
+                let index = currentRowContext.sPath.split("/")[2];
+                var _rowData = _rowAllData.getAllCurrentContexts()[index].getObject();              
+                // Use standard UI5 jQuery extension safely on the row container itself
+                var $rowDom = selectedRow.$();
+                $rowDom.removeClass("assemblyPrd");              
+                // Safe access to the row selector checkbox DOM
+                var columId = "#" + oTable.getId() + "-rowsel" + i;
+                $(columId).removeClass("hideCheckbox");
+                var _EditDelQty = _rowData["EditDelQty"];
+                // Loop dynamically through columns using UI5 element APIs rather than physical index paths
+                oTable.getColumns().forEach(function (oColumn) {
+                    let sKey = oColumn.data("p13nKey");
+                    let oCell = selectedRow.getCells()[oTable.indexOfColumn(oColumn)];                  
+                    if (oCell) {
+                        // Get the structural table cell DOM wrapper (the standard <td> block)
+                        var $cellTdWrapper = oCell.$().closest(".sapUiTableDataCell");
+                        var $cellInner = oCell.$().closest(".sapUiTableCellInner");
+                        // Clean background states cleanly across lifecycle updates
+                        $cellTdWrapper.removeClass("subHeader");
+                        $cellInner.removeClass("subHeader");
+                        $cellInner.removeClass("cussapMLnkSubtle");
+                        if (_rowData["IsMain"] != true && _rowData["RootId"] == 99) {
+                            if (sKey !== "TRAFF_LGT" && sKey !== "SUPP_NO" && sKey !== "SUPP_NAME" && sKey !== "SUPP_CITY" && sKey !== "SUPP_CTRY") {                               
+                                // Apply the subHeader style class directly onto the cell boundaries 
+                                $cellTdWrapper.addClass("subHeader");
+                                $cellInner.addClass("subHeader");
+                                if (sKey === "STOCK") { 
+                                    $cellInner.addClass("cussapMLnkSubtle");
+                                }
+                            }
+                        }
+                    }
+                });
+                // Add class back to row wrapper if main
+                if (_rowData["IsMain"] === true) {
+                    $rowDom.addClass("assemblyPrd");
+                }
+            }
         },
          _fnHandleLinkPress:  function(e){
            // debugger;
@@ -950,26 +1036,18 @@ sap.ui.define([
             if (oEvent.getSource().getSelectedIndices().length >= 1) {
                 this.getModel("subconModel").setProperty("/createEnable", true);
                 this.getModel("subconModel").setProperty("/bDisplayEnable", true);
-                var aItemsSelected = this._oUIDynamicTable.getSelectedIndices();
-                let aTableContext = this._oUIDynamicTable.getBinding('rows').getAllCurrentContexts();
-                for (let sIndex in aTableContext) {
+                //var aItemsSelected = this._oUIDynamicTable.getSelectedIndices();
+                //let aTableContext = this._oUIDynamicTable.getBinding('rows').getAllCurrentContexts();
+/*                 for (let sIndex in aTableContext) {
                     sIndex = parseInt(sIndex);
                     aItemsSelected.forEach(_aIndex => {
-                if (sIndex == _aIndex) {
-                    if (aTableContext[sIndex].getObject()['IsMain'] == true) {
-                        // this._oUIDynamicTable.setSelectionInterval(sIndex, sIndex)
-                        // set selection for all of child row.
-                        // sub-item data
-                        /*                          for(let i = sIndex + 1; i < aTableContext.length; i++ ){
-                                let b = aTableContext[i].getObject();
-                                if(b['ParentId'] == aTableContext[sIndex].getObject()['RootId'] && b['IsMain'] == false){
-                                    this._oUIDynamicTable.setSelectedIndex(i)
-                                }
-                               } */
+                    if (sIndex == _aIndex) {
+                        if (aTableContext[sIndex].getObject()['IsMain'] == true) {
+
+                        }
                     }
-                }
-            }) 
-        }
+                    }) 
+               } */
         } else {
             this.getModel("subconModel").setProperty("/createEnable", false);
             this.getModel("subconModel").setProperty("/bDisplayEnable", false);
