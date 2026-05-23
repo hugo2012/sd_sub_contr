@@ -5,8 +5,6 @@ sap.ui.define([
     "sap/ui/model/Filter",
     "sap/ui/model/FilterOperator",
     "sap/m/Dialog",
-    "sap/m/IconTabBar",
-    "sap/m/IconTabFilter",
     "sap/m/List",
     "sap/m/CustomListItem",
     "sap/m/HBox",
@@ -15,77 +13,63 @@ sap.ui.define([
     "sap/m/Text",
     "sap/m/Label",
     "sap/m/Input",
-    "sap/m/Select",
-    "sap/m/Switch",
     "sap/m/Button",
-    "sap/ui/core/Item"
-], function (BaseObject, JSONModel, Sorter, Filter, FilterOperator, Dialog, IconTabBar, IconTabFilter, List, CustomListItem, HBox, VBox, CheckBox, Text, Label, Input, Select, Switch, Button, Item) {
+    "sap/m/Select",
+    "sap/ui/core/Item",
+    "sap/m/MessageBox",
+    "sap/m/MessageToast",
+    "sap/ui/core/library",
+    "sap/m/IconTabBar",
+    "sap/m/IconTabFilter",
+], function (BaseObject, JSONModel, Sorter, Filter, FilterOperator, Dialog, List,
+     CustomListItem, HBox, VBox, CheckBox, Text, Label, Input, Button, Select, 
+     Item, MessageBox, MessageToast, coreLibrary,IconTabBar, IconTabFilter) {
     "use strict";
 
     return BaseObject.extend("com.bosch.rb1m.sd.sd_subcontr.util.TablePersoHelper", {
 
         /**
          * Constructor
-         * @param {sap.ui.table.Table} oTable Target layout grid UI element instance to handle settings variants
-         * @param {Array} aColumnConfig Standard Array structure sample block configuration format: [{ key: 'TRAFF_LGT', label: 'Traffic Light' }]
          */
-        constructor: function (oTable, aColumnConfig, oDataModel, oDefaultVariant) {
+        constructor: function (oTable, aColumnConfig, oODataModel, sDefaultVariant) {
             this._oTable = oTable;
-            this._oTableModel = oDataModel || oTable.getModel();
-            this._aColumnConfig = aColumnConfig || []; // Kept as standard sequential configuration array
-
-            // State Tracking Model setup using the "state>" mapping context namespace
-            this._stateModel = new JSONModel({ columns: [], sort: [], filter: [], group: [] });
-            this._originalState = JSON.stringify({ columns: [], sort: [], filter: [], group: [] });
+            this._oODataModel = oODataModel || oTable.getModel();
+            this._aColumnConfig = aColumnConfig || [];
             
+            // Layout customization state model
+            this._stateModel = new JSONModel({ columns: [] });
+            
+            // Separate standalone variant management model
             this._variantModel = new JSONModel({
                 variants: [],
-                selected: ""
+                selected: sDefaultVariant || "Standard",
+                newVariantName: "",
+                setAsDefault: false
             });
-
+            
             this._oDialog = null;
-
-            // Load saved local presets and initialize defaults
-            this._loadVariantsToModel();
+            this._oVariantDialog = null;
+            
             this._initDefaultState();
-
-            // Track state modifications dynamically
-            this._stateModel.attachPropertyChange(() => {
-                this._updateDirtyFlag();
-            });
+            //this.fetchVariantsFromBackend();
         },
 
-        /**
-         * Parses input configuration array items sequence parameters cleanly into structural models mapping fields
-         */
         _initDefaultState: function () {
             if (!this._aColumnConfig || this._aColumnConfig.length === 0) return;
 
-            // Map standard sequential properties arrays into persistent properties fields structures
             const aCols = this._aColumnConfig.map((oItem, iIndex) => ({
                 key: oItem.key,
                 visible: oItem.visible !== undefined ? oItem.visible : true,
                 order: oItem.order !== undefined ? oItem.order : iIndex,
                 width: oItem.width !== undefined ? oItem.width : "5rem",
-                selected: oItem.selected !== undefined ? oItem.selected : iIndex === 0
+                selected: oItem.selected !== undefined ? oItem.selected : true
             }));
 
             this._stateModel.setProperty("/columns", aCols);
-            this._stateModel.setProperty("/sort", []);
-            this._stateModel.setProperty("/filter", []);
-            this._stateModel.setProperty("/group", []);
-            
-            this._originalState = JSON.stringify(this._stateModel.getData());
-
-            const sDefaultKey = this._variantModel.getProperty("/selected");
-            if (sDefaultKey) {
-                this._loadVariant(sDefaultKey);
-            }
         },
 
         /**
-         * Contextual Dialog routing entry point wrapper
-         * @param {string} [sTabKey] Explicit selection focus override pointer ("column", "sort", "filterTab", "group")
+         * Opens the Main Columns Customization Dialog
          */
         openDialog: function (sTabKey) {
             if (!this._oDialog) {
@@ -93,7 +77,6 @@ sap.ui.define([
                 this._oDialog.setModel(this._stateModel, "state");
                 this._oDialog.setModel(this._variantModel, "variant");
             }
-
             if (sTabKey && this._oTabBar) {
                 this._oTabBar.setSelectedKey(sTabKey);
                 this._oTabBar.getItems().forEach(item => {
@@ -105,8 +88,162 @@ sap.ui.define([
 
             this._oDialog.open();
         },
-       
-    _columnsTab: function () {
+
+        /**
+         * Main Personalization Dialog Builder
+         */
+        _createDialogStructure: function () {
+            this._oTabBar = new IconTabBar({
+                expandable: false,
+                items: [
+                    // --- TAB 1: COLUMNS DISPLAY VISIBILITY ---
+                    this._columnsTab().setKey("columnTab"),               
+                    // --- TAB 2: LEVEL SELECT SORT MAPPERS ---
+                    this._sortTab().setKey("sortTab"),
+                    // --- TAB 3: DYNAMIC RULES VALUE-HELP FILTERS ---
+                    this._filterTab().setKey("filterTab"),
+                    // --- TAB 4: ALV MANUALLY TRIGGERED MULTI-GROUP RULES ---
+                    this._groupTab().setKey("groupTab")
+                ]
+            });
+
+            return new Dialog({
+                title: "Table Columns Settings",
+                contentWidth: "550px",
+                contentHeight: "450px",
+                draggable: true,
+                content: [this._oTabBar],
+                buttons: [
+                    new Button({
+                        text: "Manage Layout",
+                        icon: "sap-icon://action-settings",
+                        type: "Default",
+                        press: () => this.openVariantDialog()
+                    }),
+                    new Button({
+                        text: "Apply Layout",
+                        type: "Emphasized",
+                        press: () => {
+                            this._applyStateToUI5Table();
+                            this._oDialog.close();
+                        }
+                    }),
+                    new Button({
+                        text: "Close",
+                        press: () => this._oDialog.close()
+                    })
+                ]
+            });
+        },
+         _createValueControl: function () {
+            return new HBox({
+                alignItems: "Center",
+                items: [
+                    new Input({
+                        value: "{state>value1}", placeholder: "Select criteria...", width: "160px",
+                        showValueHelp: true,
+                        valueHelpRequest: (oEvt) => this._onFilterValueHelpRequest(oEvt, "value1"),
+                        visible: { path: "state>operator", formatter: (op) => op !== "BT" }
+                    }),
+                    new HBox({
+                        alignItems: "Center",
+                        visible: { path: "state>operator", formatter: (op) => op === "BT" },
+                        items: [
+                            new Input({
+                                value: "{state>value1}", placeholder: "From...", width: "110px",
+                                showValueHelp: true, valueHelpRequest: (oEvt) => this._onFilterValueHelpRequest(oEvt, "value1")
+                            }).addStyleClass("sapUiTinyMarginEnd"),
+                            new Label({ text: "to" }).addStyleClass("sapUiTinyMarginEnd"),
+                            new Input({
+                                value: "{state>value2}", placeholder: "To...", width: "110px",
+                                showValueHelp: true, valueHelpRequest: (oEvt) => this._onFilterValueHelpRequest(oEvt, "value2")
+                            })
+                        ]
+                    })
+                ]
+            });
+        },
+        /**
+         * Built to handle dynamic, unlimited rule creation filtering logic blocks perfectly
+         */
+        _filterTab: function () {
+            return new IconTabFilter({
+                key: "filterTab",
+                text: "Filters",
+                visible: false, // Set to true if filter tab should be available
+                content: [
+                    new sap.m.OverflowToolbar({
+                        content: [
+                            new sap.m.ToolbarSpacer(),
+                            new Button({
+                                text: "Add Filter", icon: "sap-icon://add", type: "Emphasized",
+                                press: () => {
+                                    const d = this._stateModel.getProperty("/filter") || [];
+                                    const firstKey = this._aColumnConfig[0]?.key || "TRAFF_LGT"; 
+                                    d.push({
+                                        key: firstKey,
+                                        operator: "EQ",
+                                        value1: "", value2: "",
+                                        values: [], exclude: false
+                                    });
+                                    this._stateModel.setProperty("/filter", d);
+                                    this._stateModel.refresh(true);
+                                }
+                            })
+                        ]
+                    }),
+
+                    new List({
+                        id:  this.createId ? this.createId("perso_filterColumnList") : undefined,
+                        noDataText: "No filters defined. Click 'Add Filter' to begin.",
+                        items: {
+                            path: "state>/filter",
+                            template: new CustomListItem({
+                                content: new HBox({
+                                    alignItems: "Center", justifyContent: "Start",
+                                    items: [
+                                        new Select({
+                                            selectedKey: "{state>operator}", width: "120px",
+                                            change: () => this._stateModel.refresh(true),
+                                            items: [
+                                                new Item({key: "EQ", text: "Equals"}),
+                                                new Item({key: "Contains", text: "Contains"}),
+                                                new Item({key: "BT", text: "Between"}),
+                                                new Item({key: "GT", text: "Greater Than"}),
+                                                new Item({key: "LT", text: "Less Than"})
+                                            ]
+                                        }).addStyleClass("sapUiTinyMarginEnd"),
+
+                                        new Select({
+                                            selectedKey: "{state>key}", width: "180px",
+                                            items: this._getItems(),
+                                            change: () => this._stateModel.refresh(true)
+                                        }).addStyleClass("sapUiTinyMarginEnd"),
+
+                                        this._createValueControl(),
+
+                                        new sap.m.ToolbarSpacer(),
+
+                                        new sap.m.Button({
+                                            icon: "sap-icon://delete", type: "Transparent",
+                                            press: (e) => {
+                                                const ctx = e.getSource().getBindingContext("state");
+                                                const index = parseInt(ctx.getPath().split("/").pop());
+                                                const filters = this._stateModel.getProperty("/filter");
+                                                filters.splice(index, 1);
+                                                this._stateModel.setProperty("/filter", filters);
+                                                this._stateModel.refresh(true);
+                                            }
+                                        })
+                                    ]
+                                }).addStyleClass("sapUiSmallMargin")
+                            })
+                        }
+                    })
+                ]
+            });
+        },
+         _columnsTab: function () {
             return new IconTabFilter({
                 key: "columnTab",
                 text: "Columns",
@@ -283,6 +420,9 @@ sap.ui.define([
                            
             });
         },
+          _getItems: function () {
+            return this._aColumnConfig.map(o => new Item({ key: o.key, text: o.label }));
+        },
          _sortTab: function () {
                 return new IconTabFilter({
                     key: "sortTab",
@@ -382,416 +522,270 @@ sap.ui.define([
                      ]         
                 });
             },  
-        _getIndex: function (oEvent) {
-            const ctx = oEvent.getSource().getBindingContext("state");
-            const path = ctx.getPath(); // "/columns/3"
-            return parseInt(path.split("/").pop(), 10);
-        },
-        _getIndexFromItem: function (item) {
-            const ctx = item.getBindingContext("state");
-            return parseInt(ctx.getPath().split("/").pop(), 10);
-        },
-
-        _reorderByDrag: function (from, to) {
-            const cols = this._stateModel.getProperty("/columns");
-            const [moved] = cols.splice(from, 1);
-            cols.splice(to, 0, moved);
-            cols.forEach((c, i) => c.order = i);
-            this._stateModel.refresh(true);
-        },
         /**
-         * Translates metadata configurations seamlessly into structural dialog tabs configurations
+         * OPENS SEPARATE STANDALONE VARIANT DIALOG SCREEN
          */
-        _createDialogStructure: function () {
-            this._oTabBar = new IconTabBar({
-                expandable: false,
-                items: [
-                    // --- TAB 1: COLUMNS DISPLAY VISIBILITY ---
-                    this._columnsTab().setKey("columnTab"),               
-                    // --- TAB 2: LEVEL SELECT SORT MAPPERS ---
-                    this._sortTab().setKey("sortTab"),
-                    // --- TAB 3: DYNAMIC RULES VALUE-HELP FILTERS ---
-                    this._filterTab().setKey("filterTab"),
-                    // --- TAB 4: ALV MANUALLY TRIGGERED MULTI-GROUP RULES ---
-                    this._groupTab().setKey("groupTab")
-                ]
-            });
-
-            return new Dialog({
-                title: "View Settings",
-                contentWidth: "650px", contentHeight: "500px",
-                draggable: true, resizable: true,
-                content: [this._oTabBar],
-                buttons: [
-                    new Button({
-                        text: "Apply", type: "Emphasized",
-                        press: () => {
-                            this._applyState();
-                            this._oDialog.close();
-                        }
-                    }),
-                    new Button({
-                        text: "Close",
-                        press: () => this._oDialog.close()
-                    })
-                ]
-            });
+        openVariantDialog: function () {
+            if (!this._oVariantDialog) {
+                this._oVariantDialog = this._createVariantDialogStructure();
+                this._oVariantDialog.setModel(this._variantModel, "variant");
+            }
+            this._oVariantDialog.open();
         },
 
         /**
-         * Built to handle dynamic, unlimited rule creation filtering logic blocks perfectly
+         * Builds the separate Variant Management layout dialog screen
          */
-        _filterTab: function () {
-            return new IconTabFilter({
-                key: "filterTab",
-                text: "Filters",
-                visible: false, // Set to true if filter tab should be available
-                content: [
-                    new sap.m.OverflowToolbar({
-                        content: [
-                            new sap.m.ToolbarSpacer(),
-                            new Button({
-                                text: "Add Filter", icon: "sap-icon://add", type: "Emphasized",
-                                press: () => {
-                                    const d = this._stateModel.getProperty("/filter") || [];
-                                    const firstKey = this._aColumnConfig[0]?.key || "TRAFF_LGT"; 
-                                    d.push({
-                                        key: firstKey,
-                                        operator: "EQ",
-                                        value1: "", value2: "",
-                                        values: [], exclude: false
-                                    });
-                                    this._stateModel.setProperty("/filter", d);
-                                    this._stateModel.refresh(true);
-                                }
-                            })
-                        ]
-                    }),
-
-                    new List({
-                        id:  this.createId ? this.createId("perso_filterColumnList") : undefined,
-                        noDataText: "No filters defined. Click 'Add Filter' to begin.",
-                        items: {
-                            path: "state>/filter",
-                            template: new CustomListItem({
-                                content: new HBox({
-                                    alignItems: "Center", justifyContent: "Start",
-                                    items: [
-                                        new Select({
-                                            selectedKey: "{state>operator}", width: "120px",
-                                            change: () => this._stateModel.refresh(true),
-                                            items: [
-                                                new Item({key: "EQ", text: "Equals"}),
-                                                new Item({key: "Contains", text: "Contains"}),
-                                                new Item({key: "BT", text: "Between"}),
-                                                new Item({key: "GT", text: "Greater Than"}),
-                                                new Item({key: "LT", text: "Less Than"})
-                                            ]
-                                        }).addStyleClass("sapUiTinyMarginEnd"),
-
-                                        new Select({
-                                            selectedKey: "{state>key}", width: "180px",
-                                            items: this._getItems(),
-                                            change: () => this._stateModel.refresh(true)
-                                        }).addStyleClass("sapUiTinyMarginEnd"),
-
-                                        this._createValueControl(),
-
-                                        new sap.m.ToolbarSpacer(),
-
-                                        new sap.m.Button({
-                                            icon: "sap-icon://delete", type: "Transparent",
-                                            press: (e) => {
-                                                const ctx = e.getSource().getBindingContext("state");
-                                                const index = parseInt(ctx.getPath().split("/").pop());
-                                                const filters = this._stateModel.getProperty("/filter");
-                                                filters.splice(index, 1);
-                                                this._stateModel.setProperty("/filter", filters);
-                                                this._stateModel.refresh(true);
-                                            }
-                                        })
-                                    ]
-                                }).addStyleClass("sapUiSmallMargin")
-                            })
-                        }
+        _createVariantDialogStructure: function () {
+            var oLayoutList = new List({
+                headerText: "Available Layout Variants",
+                mode: "None",
+                items: {
+                    path: "variant>/variants",
+                    template: new CustomListItem({
+                        content: new HBox({
+                            justifyContent: "SpaceBetween",
+                            alignItems: "Center",
+                            width: "100%",
+                            items: [
+                                new Text({ text: "{variant>text}", design: "Bold" }),
+                                new Button({
+                                    text: "Load Layout",
+                                    icon: "sap-icon://drill-up",
+                                    type: "Transparent",
+                                    press: (oEvent) => {
+                                        var sKey = oEvent.getSource().getBindingContext("variant").getProperty("key");
+                                        this._variantModel.setProperty("/selected", sKey);
+                                        this.applyBackendVariant(sKey);
+                                        this._oVariantDialog.close();
+                                    }
+                                })
+                            ]
+                        }).addStyleClass("sapUiSmallMargin")
                     })
-                ]
+                }
             });
-        },
 
-        _createValueControl: function () {
-            return new HBox({
-                alignItems: "Center",
+            var oInputPanel = new VBox({
                 items: [
-                    new Input({
-                        value: "{state>value1}", placeholder: "Select criteria...", width: "160px",
-                        showValueHelp: true,
-                        valueHelpRequest: (oEvt) => this._onFilterValueHelpRequest(oEvt, "value1"),
-                        visible: { path: "state>operator", formatter: (op) => op !== "BT" }
-                    }),
+                    new Label({ text: "Create New Layout Variant Name:", design: "Bold" }).addStyleClass("sapUiSmallMarginTop"),
                     new HBox({
+                        width: "100%",
                         alignItems: "Center",
-                        visible: { path: "state>operator", formatter: (op) => op === "BT" },
                         items: [
                             new Input({
-                                value: "{state>value1}", placeholder: "From...", width: "110px",
-                                showValueHelp: true, valueHelpRequest: (oEvt) => this._onFilterValueHelpRequest(oEvt, "value1")
-                            }).addStyleClass("sapUiTinyMarginEnd"),
-                            new Label({ text: "to" }).addStyleClass("sapUiTinyMarginEnd"),
-                            new Input({
-                                value: "{state>value2}", placeholder: "To...", width: "110px",
-                                showValueHelp: true, valueHelpRequest: (oEvt) => this._onFilterValueHelpRequest(oEvt, "value2")
-                            })
+                                value: "{variant>/newVariantName}",
+                                placeholder: "Type layout identity...",
+                                width: "60%"
+                            }),
+                            new CheckBox({
+                                text: "Set Default",
+                                selected: "{variant>/setAsDefault}"
+                            }).addStyleClass("sapUiSmallMarginBegin")
                         ]
+                    })
+                ]
+            }).addStyleClass("sapUiContentPadding");
+
+            return new Dialog({
+                title: "Manage Table Layout Variants",
+                contentWidth: "450px",
+                contentHeight: "400px",
+                type: "Message",
+                content: [oLayoutList, oInputPanel],
+                buttons: [
+                    // SAVE AS BUTTON: Updates/Overwrites current selected layout configurations
+                    new Button({
+                        text: "Save As",
+                        icon: "sap-icon://save",
+                        type: "Emphasized",
+                        tooltip: "Overwrite currently active selected variant settings",
+                        press: () => {
+                            var sSelectedKey = this._variantModel.getProperty("/selected");
+                            if (sSelectedKey === "Standard") {
+                                MessageBox.warning("System Standard template cannot be overwritten. Please save a new variant.");
+                                return;
+                            }
+                            this.saveVariantToBackend(sSelectedKey, sSelectedKey, false);
+                            this._oVariantDialog.close();
+                        }
+                    }),
+                    // SAVE NEW BUTTON: Generates a completely separate database record entry
+                    new Button({
+                        text: "Save New",
+                        icon: "sap-icon://add",
+                        type: "Accept",
+                        press: () => {
+                            var sNewName = this._variantModel.getProperty("/newVariantName");
+                            var bIsDefault = this._variantModel.getProperty("/setAsDefault");
+                            if (!sNewName) {
+                                MessageToast.show("Please enter a layout name.");
+                                return;
+                            }
+                            this.saveVariantToBackend(sNewName, sNewName, bIsDefault);
+                            this._oVariantDialog.close();
+                        }
+                    }),
+                    new Button({
+                        text: "Back",
+                        press: () => this._oVariantDialog.close()
                     })
                 ]
             });
         },
 
-        _onFilterValueHelpRequest: function (oEvent, sFieldTarget) {
-            const oInput = oEvent.getSource();
-            const oContext = oInput.getBindingContext("state");
-            const sKey = oContext.getProperty("key");
-            const sLabel = this._getLabelByKey(sKey);
+        /* ================================================================= */
+        /* ODATA BACKEND INTEGRATION                                         */
+        /* ================================================================= */
 
-            const oTableModel = this._oTableModel;
-            if (!oTableModel) return;
-            
-            const aRows = oTableModel.getProperty("/ItemsSet") || oTableModel.getProperty("/rows") || [];
-            const aUnique = [...new Set(aRows.map(r => r[sKey]).filter(v => v !== undefined && v !== null && v !== ""))].sort();
+        fetchVariantsFromBackend: function () {
+            var sTableKey = this._oTable.getId().split("---")[1] || "tblsubcon";
+            var aFilters = [
+                new Filter("AppId", FilterOperator.EQ, "SUBCON_ALV_APP"),
+                new Filter("TableId", FilterOperator.EQ, sTableKey)
+            ];
 
-            const oVhModel = new JSONModel({ items: aUnique.map(v => ({ value: v })) });
-            const oSelectDialog = new sap.m.SelectDialog({
-                title: `Select Value for ${sLabel}`,
-                rememberSelections: false,
-                items: { path: "/items", template: new sap.m.StandardListItem({ title: "{value}", type: "Active" }) },
-                search: (oSearchEvt) => {
-                    const sVal = oSearchEvt.getParameter("value");
-                    const oFilter = sVal ? new Filter("value", FilterOperator.Contains, sVal) : [];
-                    oSearchEvt.getSource().getBinding("items").filter(oFilter);
-                },
-                confirm: (oConfirmEvt) => {
-                    const oSel = oConfirmEvt.getParameter("selectedItem");
-                    if (oSel) {
-                        oContext.getModel().setProperty(`${oContext.getPath()}/${sFieldTarget}`, oSel.getTitle());
-                        this._stateModel.refresh(true);
+            this._oODataModel.read("/TableVariantSet", {
+                filters: aFilters,
+                success: function (oData) {
+                    var aVariants = oData.results.map(function (oItem) {
+                        return {
+                            key: oItem.VariantId,
+                            text: oItem.IsDefault === "X" ? oItem.VariantName + " (Default)" : oItem.VariantName
+                        };
+                    });
+
+                    if (!aVariants.some(v => v.key === "Standard")) {
+                        aVariants.unshift({ key: "Standard", text: "Standard (Default System)" });
                     }
-                    oSelectDialog.destroy();
-                },
-                cancel: () => oSelectDialog.destroy()
+
+                    this._variantModel.setProperty("/variants", aVariants);
+
+                    var oDefault = oData.results.find(v => v.IsDefault === "X");
+                    if (oDefault) {
+                        this._variantModel.setProperty("/selected", oDefault.VariantId);
+                        this.applyBackendVariant(oDefault.VariantId);
+                    }
+                }.bind(this),
+                error: function () {
+                    jQuery.sap.log.error("Could not fetch user variants from SAP OData.");
+                }
+            });
+        },
+
+        saveVariantToBackend: function (sVariantId, sVariantDesc, bIsDefault) {
+            var sTableKey = this._oTable.getId().split("---")[1] || "tblsubcon";
+            var oCurrentState = this._stateModel.getData();
+
+            var oPayload = {
+                AppId: "SUBCON_ALV_APP",
+                TableId: sTableKey,
+                VariantId: sVariantId,
+                VariantName: sVariantDesc,
+                IsDefault: bIsDefault ? "X" : "",
+                ConfigPayload: JSON.stringify(oCurrentState)
+            };
+
+            sap.ui.core.BusyIndicator.show(0);
+            this._oODataModel.create("/TableVariantSet", oPayload, {
+                success: function () {
+                    sap.ui.core.BusyIndicator.hide();
+                    MessageToast.show("Variant saved to database registry.");
+                    this._variantModel.setProperty("/newVariantName", "");
+                    this.fetchVariantsFromBackend();
+                }.bind(this),
+                error: function () {
+                    sap.ui.core.BusyIndicator.hide();
+                    MessageBox.error("Failed to write layout configurations.");
+                }
+            });
+        },
+
+        applyBackendVariant: function (sVariantId) {
+            if (sVariantId === "Standard") {
+                this._initDefaultState();
+                this._applyStateToUI5Table();
+                return;
+            }
+
+            var sTableKey = this._oTable.getId().split("---")[1] || "tblsubcon";
+            var sKeyPath = this._oODataModel.createKey("/TableVariantSet", {
+                AppId: "SUBCON_ALV_APP",
+                TableId: sTableKey,
+                VariantId: sVariantId
             });
 
-            oSelectDialog.setModel(oVhModel);
-            oSelectDialog.open();
+            sap.ui.core.BusyIndicator.show(0);
+            this._oODataModel.read(sKeyPath, {
+                success: function (oData) {
+                    sap.ui.core.BusyIndicator.hide();
+                    if (oData && oData.ConfigPayload) {
+                        var oSavedState = JSON.parse(oData.ConfigPayload);
+                        this._stateModel.setData(oSavedState);
+                        this._applyStateToUI5Table();
+                    }
+                }.bind(this),
+                error: function () {
+                    sap.ui.core.BusyIndicator.hide();
+                    MessageBox.error("Error reading specific layout configuration.");
+                }
+            });
         },
 
-        _getItems: function () {
-            return this._aColumnConfig.map(o => new Item({ key: o.key, text: o.label }));
+        _applyStateToUI5Table: function () {
+            var oTable = this._oTable;
+            var aColsState = this._stateModel.getProperty("/columns") || [];
+
+            oTable.getColumns().forEach(function (oColumn) {
+                var sP13nKey = oColumn.data("p13nKey");
+                var oMatch = aColsState.find(c => c.key === sP13nKey);
+
+                if (oMatch) {
+                    oColumn.setVisible(oMatch.visible);
+                    if (oMatch.width) oColumn.setWidth(oMatch.width);
+                }
+            });
+
+            var aSortedState = [...aColsState].sort((a, b) => a.order - b.order);
+            aSortedState.forEach(function (oColState, iIndex) {
+                var oCol = oTable.getColumns().find(c => c.data("p13nKey") === oColState.key);
+                if (oCol) {
+                    oTable.removeColumn(oCol);
+                    oTable.insertColumn(oCol, iIndex);
+                }
+            });
         },
 
-        _getLabelByKey: function (sKey) {
-            const match = this._aColumnConfig.find(o => o.key === sKey);
-            return match ? match.label : sKey;
-        },
+        /* Layout internal structural utilities */
+        _moveColumn: function (iIndex, sDirection) {
+            var aCols = this._stateModel.getProperty("/columns");
+            if (iIndex < 0 || iIndex >= aCols.length) return;
 
-        _onMoveColumnPress: function (oEvent, sDirection) {
-            const oItem = oEvent.getSource().getParent().getParent().getParent();
-            const iIndex = oItem.getParent().indexOfItem(oItem);
-            const aCols = this._stateModel.getProperty("/columns");
-            if (iIndex === -1) return;
+            var [oMoved] = aCols.splice(iIndex, 1);
 
-            let iNewIndex = sDirection === "up" ? iIndex - 1 : iIndex + 1;
-            if (iNewIndex < 0 || iNewIndex >= aCols.length) return;
-
-            const [moved] = aCols.splice(iIndex, 1);
-            aCols.splice(iNewIndex, 0, moved);
+            if (sDirection === "first") aCols.unshift(oMoved);
+            else if (sDirection === "last") aCols.push(oMoved);
+            else if (sDirection === "up") aCols.splice(Math.max(0, iIndex - 1), 0, oMoved);
+            else if (sDirection === "down") aCols.splice(Math.min(aCols.length, iIndex + 1), 0, oMoved);
 
             aCols.forEach((c, i) => c.order = i);
             this._stateModel.refresh(true);
         },
-       _moveColumn: function (index, direction) {
-            const cols = this._stateModel.getProperty("/columns");
-            if (index < 0 || index >= cols.length) return;
-            let newIndex = index;
-            switch (direction) {
-                case "up":
-                    newIndex = index - 1;
-                    break;
-                case "down":
-                    newIndex = index + 1;
-                    break;
-                case "first":
-                    newIndex = 0;
-                    break;
-                case "last":
-                    newIndex = cols.length - 1;
-                    break;
-            }
-            if (newIndex < 0 || newIndex >= cols.length) return;
-            // ✅ remove and insert
-            const [moved] = cols.splice(index, 1);
-            cols.splice(newIndex, 0, moved);
-            // ✅ reassign order
+
+        _getIndex: function (oEvent) {
+            return parseInt(oEvent.getSource().getBindingContext("state").getPath().split("/").pop(), 10);
+        },
+
+        _getIndexFromItem: function (item) {
+            return parseInt(item.getBindingContext("state").getPath().split("/").pop(), 10);
+        },
+
+        _reorderByDrag: function (from, to) {
+            var cols = this._stateModel.getProperty("/columns");
+            var [moved] = cols.splice(from, 1);
+            cols.splice(to, 0, moved);
             cols.forEach((c, i) => c.order = i);
             this._stateModel.refresh(true);
-        },
-        _onSortDropdownChange: function (oEvent) {
-            const sSel = oEvent.getParameter("selectedItem").getKey();
-            const sKey = oEvent.getSource().getBindingContext("state").getProperty("key");
-            let aSorts = this._stateModel.getProperty("/sort") || [];
-
-            aSorts = aSorts.filter(s => s.key !== sKey);
-            if (sSel !== "None") {
-                aSorts.push({ key: sKey, descending: sSel === "Descending" });
-            }
-            this._stateModel.setProperty("/sort", aSorts);
-        },
-
-        _onGroupSwitchToggle: function (oEvent) {
-            const bState = oEvent.getParameter("state");
-            const sKey = oEvent.getSource().getBindingContext("state").getProperty("key");
-            let aGroups = this._stateModel.getProperty("/group") || [];
-
-            aGroups = aGroups.filter(g => g.key !== sKey);
-            if (bState) {
-                aGroups.push({ key: sKey });
-            }
-            this._stateModel.setProperty("/group", aGroups);
-        },
-
-        // =========================================================================
-        // PERFORMANCE MUTATION PIPELINE (MUTATES EXISTING COLUMNS SAFELY IN PLACE)
-        // =========================================================================
-        _applyState: function () {
-            const oTable = this._oTable;
-            const oState = this._stateModel.getData();
-            const oModel = this._oTableModel;
-            if (!oModel) return;
-
-            let aRows = oModel.getProperty("/ItemsSet") || oModel.getProperty("/rows") || [];
-            if (!Array.isArray(aRows)) return;
-            aRows = [...aRows];
-
-            // 1. RUN CUSTOM FILTER OPERATIONS
-            oState.filter.forEach(f => {
-                if (f.value1) {
-                    const sV1 = String(f.value1).toLowerCase();
-                    const sV2 = f.value2 ? String(f.value2).toLowerCase() : "";
-
-                    aRows = aRows.filter(oItem => {
-                        const sTarget = String(oItem[f.key] || "").toLowerCase();
-                        switch (f.operator) {
-                            case "Contains": return sTarget.includes(sV1);
-                            case "EQ":       return sTarget === sV1;
-                            case "GT":       return sTarget > sV1;
-                            case "LT":       return sTarget < sV1;
-                            case "BT":       return sTarget >= sV1 && sTarget <= sV2;
-                            default:         return sTarget.includes(sV1);
-                        }
-                    });
-                }
-            });
-
-            // 2. RUN SORT CRITERIA MUTATIONS
-            oState.sort.forEach(s => {
-                const sKey = s.key, bDesc = !!s.descending;
-                aRows.sort((a, b) => {
-                    if (a[sKey] === b[sKey]) return 0;
-                    return bDesc ? (a[sKey] < b[sKey] ? 1 : -1) : (a[sKey] > b[sKey] ? 1 : -1);
-                });
-            });
-
-            // 3. 🌟 IN-PLACE COLUMN MUTATION & POSITION SHIFT ENGINE (WITHOUT TEARDOWN) 🌟
-            const aExistingColumns = oTable.getColumns();
-
-            oState.columns
-                .filter(c => c.visible)
-                .sort((a, b) => a.order - b.order)
-                .forEach((c, iNewIndex) => {
-                    const oTargetCol = aExistingColumns.find(col => col.data("p13nKey") === c.key);
-                    if (oTargetCol) {
-                        oTargetCol.setVisible(true);
-                        oTargetCol.setWidth(c.width);
-                        // Sync Sort State Visual Markers
-                        const oSortInfo = oState.sort.find(s => s.key === c.key);
-                        oTargetCol.setSorted(!!oSortInfo);
-                        oTargetCol.setSortOrder(oSortInfo ? (oSortInfo.descending ? "Descending" : "Ascending") : "None");
-
-                        // Reorder column inside array aggregation safely if position index shifted
-                        if (oTable.indexOfColumn(oTargetCol) !== iNewIndex) {
-                            oTable.removeColumn(oTargetCol);
-                            oTable.insertColumn(oTargetCol, iNewIndex);
-                        }
-                    }
-                });
-
-            // Hide columns marked invisible
-            oState.columns.filter(c => !c.visible).forEach(c => {
-                const oTargetCol = aExistingColumns.find(col => col.data("p13nKey") === c.key);
-                if (oTargetCol) {
-                    oTargetCol.setVisible(false);
-                }
-            });
-
-            // Update models data arrays endpoints
-            oModel.setProperty("/ItemsSet", aRows);
-            oModel.setProperty("/rows", aRows);
-            
-            if (oTable.getBinding("rows")) {
-                oTable.getBinding("rows").refresh(true);
-            }
-            this._updateDirtyFlag();
-        },
-
-        // =========================================================================
-        // PERSISTENCE LOCAL STORAGE & DIRTY CHECK POINTERS
-        // =========================================================================
-        _isDirty: function () {
-            return JSON.stringify(this._stateModel.getData()) !== this._originalState;
-        },
-
-        _updateDirtyFlag: function () {
-            const sSelected = this._variantModel.getProperty("/selected");
-            if (!sSelected) return;
-            const bDirty = this._isDirty();
-            const aVariants = this._variantModel.getProperty("/variants") || [];
-            
-            const aUpdated = aVariants.map(v => {
-                const sCleanKey = v.key.replace(" *", "");
-                if (sCleanKey === sSelected) {
-                    return { key: sCleanKey, text: bDirty ? sCleanKey + " *" : sCleanKey };
-                }
-                return { key: sCleanKey, text: sCleanKey };
-            });
-            this._variantModel.setProperty("/variants", aUpdated);
-        },
-
-        _loadVariantsToModel: function () {
-            let mAll = JSON.parse(localStorage.getItem("subcon_variants") || "{}");
-            if (!mAll["Standard"]) {
-                mAll["Standard"] = { columns: [], sort: [], filter: [], group: [] };
-                localStorage.setItem("subcon_variants", JSON.stringify(mAll));
-            }
-            const aNames = Object.keys(mAll);
-            this._variantModel.setData({
-                variants: aNames.map(n => ({ key: n, text: n })),
-                selected: "Standard"
-            });
-        },
-
-        _loadVariant: function (sVariantName) {
-            const mAll = JSON.parse(localStorage.getItem("subcon_variants") || "{}");
-            const oTargetData = mAll[sVariantName];
-            if ( oTargetData.columns.length <= 0) return;
-
-            this._stateModel.setData(jQuery.extend(true, {}, oTargetData));
-            this._originalState = JSON.stringify(this._stateModel.getData());
-            this._variantModel.setProperty("/selected", sVariantName);
-            this._updateDirtyFlag();
-        },
-
-        getId: function() {
-            return this._oTable ? this._oTable.getId() + "_perso" : "subcon_perso";
         }
     });
 });
