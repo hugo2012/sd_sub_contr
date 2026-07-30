@@ -48,6 +48,46 @@ sap.ui.define([
                     return "Unknown";
             }
         } ,
+         fnFormatNumcShipTo: function(a,b,c){
+           // debugger;
+              var oFloatNumberFormat = NumberFormat.getFloatInstance({
+                    maxFractionDigits: 0,
+                    minFractionDigits : 0,
+                    groupingEnabled: true
+                } , sap.ui.getCore().getConfiguration().getLocale());
+             if(c === 99){
+                return a;
+            }
+            if( b === "IsMain"){
+                 return a;
+              }
+             if( b === true){
+                 return a;
+              }  
+            var numberRegex = /^\d+$/;
+            var t = a;
+            // Validate numbers
+            var k = numberRegex.test(t);
+
+            if(a){
+               if(k == true) {
+                if(b==false || b == ""){
+                     return oFloatNumberFormat.format(a);
+                }
+                else{
+                     return a;
+                }
+
+               }
+               else{
+                return a;
+               }
+            }
+            else{
+                return a;
+            }
+
+        }   ,
         fnFormatNumeric: function(a,b,c){
            // debugger;
               var oFloatNumberFormat = NumberFormat.getFloatInstance({
@@ -134,10 +174,17 @@ sap.ui.define([
             // Validate numbers
             var a = numberRegex.test(t);
             if(a== true)
+            {
                 e.getSource().setValue(t);
-            else
-                e.getSource().setValue("")  ;
-        } ,
+                // e.setValueState(sap.ui.core.ValueState.None);
+            }
+            else{
+                 e.getSource().setValue("")  ;
+                // e.setValueState(sap.ui.core.ValueState.Error);
+                 //e.setValueStateText("Invalid number!");
+                }             
+         } , 
+          
           fnFormatType: function(a,b,c){
            // debugger;
             //var numberRegex = /^\d+$/;
@@ -343,6 +390,42 @@ sap.ui.define([
             default:
                 return "";
         }
+    },
+    _fnConvertTruefale : function(a){
+                var b = "";
+                if(a)
+                {
+                    if(a == true){
+                        b = "X";
+                    }
+                }
+                return b;
+        },
+    /**
+ * Identifies document type based on PO/Doc Number prefix
+ * @param {string|number} vDocNum The document number
+ * @returns {string} "PO", "SA", or "UNKNOWN"
+ */
+    getDocTypeByNumber: function (vDocNum,vIsMain) {
+        if (!vDocNum) {
+            return "UNKNOWN";
+        }
+
+        // 1. Convert to string and strip leading zeros & spaces
+        const sDocNum = String(vDocNum).trim().replace(/^0+/, "");
+
+        // 2. Check prefix pattern
+        if (vIsMain === true) {
+           if (sDocNum.startsWith("45")) {
+                 return "PO"; // Purchase Order (ME23N)
+            } else if (sDocNum.startsWith("5")) {
+                return "SA"; // Scheduling Agreement (ME33L)
+            }
+        }
+        else {
+            return "DO" // Delivery Order (VL03N)
+        }
+        return "UNKNOWN";
     }
    };
 });
