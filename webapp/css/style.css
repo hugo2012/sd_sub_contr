@@ -71,9 +71,9 @@
 .sapUiTableContentRow.sapUiTableRowSel {
     background-color: #F9EFDB !important;
 }
-.assemblyPrd {
+/* .assemblyPrd {
     background-color: #F9EFDB !important;
-}
+}  */
 
 /* .noneEdit {
     background-color: "lightslategrey" !important;
@@ -256,4 +256,102 @@ th.sapUiTableCol.alvHighlightHeader,
 }
 .alvHeaderFilterIcon:hover {
     color: #0854a1 !important; /* Slightly darker shade on cursor focus */
+}
+/* 1. Hide the action control buttons by default */
+.alvColumnsDisplayList .alvActionButtonsGroup {
+    visibility: hidden;
+    opacity: 0;
+    transition: visibility 0s, opacity 0.15s linear;
+}
+
+/* 2. Unhide buttons when mouse hovers over a custom list item row */
+.alvColumnsDisplayList .sapMLIB:hover .alvActionButtonsGroup {
+    visibility: visible;
+    opacity: 1;
+}
+
+/* 3. Keep buttons visible when a row is selected/active */
+.alvColumnsDisplayList .sapMLIBSelected .alvActionButtonsGroup {
+    visibility: visible;
+    opacity: 1;
+}
+
+/* Optional styling cleanup to make the actions look compact inside the dialog */
+.alvColumnsDisplayList .alvActionButtonsGroup .sapMBtn {
+    padding: 0 2px;
+}
+/* 1. Hide the buttons container by default */
+.sapMLIB .hideActionButtons {
+    visibility: hidden;
+    opacity: 0;
+    transition: visibility 0s, opacity 0.15s linear; /* Smooth transition effect */
+}
+
+/* 2. Show the buttons when the list item row is hovered */
+.sapMLIBHoverable:hover .hideActionButtons {
+    visibility: visible;
+    opacity: 1;
+}
+
+/* 3. Show the buttons when the list item row is actively selected */
+.sapMLIBSelected .hideActionButtons {
+    visibility: visible;
+    opacity: 1;
+}
+/* Optional: Adjust button spacing and alignment for a cleaner look */
+/* Target the table cell container whenever it contains a .subHeader control */
+.sapUiTableDataCell:has(.subHeader),
+.sapUiTableCellInner:has(.subHeader) {
+    background-color: #e8eff6 !important;
+}
+
+/* Ensure the control with .subHeader fills 100% of the cell */
+.subHeader {
+    background-color: #e8eff6 !important;
+    width: 100% !important;
+    height: 100% !important;
+    display: flex !important;
+    align-items: center;
+}
+
+/* Keep inner text and links transparent so background color shines through */
+.subHeader .sapMText,
+.subHeader .sapMLnk,
+.subHeader.sapMText,
+.subHeader.sapMLnk {
+    background-color: transparent !important;
+}
+
+/* Force inner Input, ComboBox, Select, Link, and Text controls to be transparent */
+.subHeader .sapMInputBaseInner,
+.subHeader .sapMInputBase,
+.subHeader .sapMSlt,
+.subHeader .sapMSltInner,
+.subHeader .sapMLnk,
+.subHeader .sapMText,
+.subHeader .sapMLabel {
+    background-color: transparent !important;
+    background: transparent !important;
+    border-color: transparent !important; /* Removes input border box if needed */
+}
+
+/* Also target parent cell wrappers containing subHeader controls */
+.sapUiTableDataCell:has(.subHeader) .sapMInputBaseInner,
+.sapUiTableCellInner:has(.subHeader) .sapMInputBaseInner {
+    background-color: transparent !important;
+    background: transparent !important;
+}
+/* Expand background color to cover the whole cell container */
+.sapUiTableDataCell:has(.assemblyPrd),
+.sapUiTableCellInner:has(.assemblyPrd) {
+    background-color: #F9EFDB !important;
+}
+
+/* Ensure control with .assemblyPrd stretches 100% inside cell */
+.assemblyPrd {
+    background-color: #F9EFDB !important;
+    width: 100% !important;
+    height: 100% !important;
+    display: flex !important;
+    align-items: center;
 }
