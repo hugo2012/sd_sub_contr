@@ -13,20 +13,56 @@ sap.ui.define([
 	"use strict";
     
     const SortOrder = coreLibrary.SortOrder;
+    
     ValueHelpDialog.prototype.cgAddFilters = function (filters) {
-        for (let filter of filters) {
-            let path = filter.path;
-            const filterField = this.dialogMetadata.columns[path].filterField;
-            if(filter){
-                if(filter.values[0]){
-                    const regex = /\*/g;
-                    let a = filter.values[0];
-                    a = a.replace(regex, "");
-                    filter.values[0] = a;
-                }
+        if (!filters || !Array.isArray(filters) || filters.length === 0) {
+            return;
+        }
+
+        // Group conditions by filter field path so multi-token fields pass all conditions together
+        const mGroupedConditions = {};
+
+        filters.forEach(oFilter => {
+            if (!oFilter) { return; }
+
+            let sPath = oFilter.path;
+
+            // 1. Sanitize all string values in the filter object (strip wildcard asterisks if needed)
+            if (Array.isArray(oFilter.values)) {
+                oFilter.values = oFilter.values.map(vVal => {
+                    if (typeof vVal === "string") {
+                        return vVal.replace(/\*/g, "");
+                    }
+                    return vVal;
+                });
             }
-            filterField.setConditions([filter]);
-            this.dialogMetadata.columns[path].filterValues.push(filter);
+
+            if (!mGroupedConditions[sPath]) {
+                mGroupedConditions[sPath] = [];
+            }
+
+            mGroupedConditions[sPath].push(oFilter);
+        });
+
+        // 2. Apply condition sets per field to the ValueHelpDialog FilterBar
+        Object.keys(mGroupedConditions).forEach(sPath => {
+            const oColMeta = this.dialogMetadata.columns[sPath];
+            if (!oColMeta) { return; }
+
+            const filterField = oColMeta.filterField;
+            const aConditions = mGroupedConditions[sPath];
+
+            if (filterField) {
+                // Set ALL token condition items on the input control
+                filterField.setConditions(aConditions);
+            }
+
+            // Store condition objects in metadata for persistence
+            oColMeta.filterValues = aConditions;
+        });
+
+        // 3. Trigger search once after all token filters are added
+        if (this.getFilterBar()) {
             this.getFilterBar().fireSearch();
         }
     }
@@ -73,12 +109,35 @@ sap.ui.define([
                 {
                     oFilterField.defaultOperator = dialogMetadata._filterOperator; 
                 }
-                filterGroupItems.push(new FilterGroupItem({
-                    groupName: sap.ui.comp.filterbar.FilterBar.INTERNAL_GROUP,
-                    name: colDef.name,
-                    label: colDef.label,
-                    control: oFilterField
-                }));
+                if (dialogMetadata.entityName === "idip_shipping_point") {
+                    /* if (colDef.name === "Plant" || colDef.name === "LoadingGroup") {
+                    }       
+                    else{
+                        filterGroupItems.push(new FilterGroupItem({
+                            groupName: sap.ui.comp.filterbar.FilterBar.INTERNAL_GROUP,
+                            name: colDef.name,
+                            label: colDef.label,
+                            control: oFilterField,
+                            visibleInFilterBar: true
+                         }));
+                    }        */    
+                    filterGroupItems.push(new FilterGroupItem({
+                            groupName: sap.ui.comp.filterbar.FilterBar.INTERNAL_GROUP,
+                            name: colDef.name,
+                            label: colDef.label,
+                            control: oFilterField,
+                            visibleInFilterBar: true
+                         }));
+                }
+                else{
+                    filterGroupItems.push(new FilterGroupItem({
+                        groupName: sap.ui.comp.filterbar.FilterBar.INTERNAL_GROUP,
+                        name: colDef.name,
+                        label: colDef.label,
+                        control: oFilterField,
+                        visibleInFilterBar: true
+                     }));
+                }
                 dialogMetadata.columns[colDef.name].filterField = oFilterField;
             }
             let dialog = await new ValueHelpDialog({
